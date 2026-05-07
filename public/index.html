@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>YouTube 关键词视频</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Outfit:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg0: #f8fafc;
+        --bg1: #eef2ff;
+        --card: #ffffff;
+        --stroke: #e2e8f0;
+        --stroke-strong: #cbd5e1;
+        --text: #0f172a;
+        --muted: #64748b;
+        --accent: #2563eb;
+        --accent-soft: #dbeafe;
+        --danger: #e11d48;
+        --ok: #059669;
+        --radius: 16px;
+        --shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 20px 40px -12px rgba(15, 23, 42, 0.12);
+        --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.06), 0 12px 32px rgba(37, 99, 235, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: 'DM Sans', system-ui, sans-serif;
+        color: var(--text);
+        background: radial-gradient(1000px 520px at 8% -5%, rgba(147, 197, 253, 0.45), transparent 55%),
+          radial-gradient(800px 480px at 92% 0%, rgba(196, 181, 253, 0.35), transparent 50%),
+          linear-gradient(180deg, var(--bg0) 0%, #f1f5f9 40%, var(--bg1) 100%);
+      }
+
+      .noise {
+        pointer-events: none;
+        position: fixed;
+        inset: 0;
+        opacity: 0.025;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+
+      .wrap {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 40px 20px 56px;
+        position: relative;
+        z-index: 1;
+      }
+
+      h1 {
+        font-family: Outfit, system-ui, sans-serif;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        font-size: clamp(1.75rem, 4vw, 2.35rem);
+        margin: 0 0 8px;
+        background: linear-gradient(115deg, #0f172a 0%, #1e3a8a 42%, #2563eb 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .sub {
+        color: var(--muted);
+        font-size: 0.95rem;
+        margin-bottom: 28px;
+        line-height: 1.55;
+      }
+
+      .sub code {
+        font-family: ui-monospace, Consolas, monospace;
+        font-size: 0.82em;
+        color: #0f172a;
+        background: #e2e8f0;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 500;
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--stroke);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-card);
+        padding: 26px 26px 22px;
+        margin-bottom: 22px;
+      }
+
+      label {
+        display: block;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--muted);
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+
+      input[type='text'],
+      input[type='password'] {
+        width: 100%;
+        padding: 13px 15px;
+        border-radius: 12px;
+        border: 1px solid var(--stroke-strong);
+        background: #ffffff;
+        color: var(--text);
+        font-size: 1rem;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+
+      input::placeholder {
+        color: #94a3b8;
+      }
+
+      input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-soft);
+      }
+
+      .row {
+        display: grid;
+        gap: 16px;
+      }
+
+      @media (min-width: 560px) {
+        .row-2 {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 20px;
+        align-items: center;
+      }
+
+      button {
+        font-family: Outfit, system-ui, sans-serif;
+        font-weight: 600;
+        border: none;
+        border-radius: 12px;
+        padding: 12px 22px;
+        cursor: pointer;
+        font-size: 0.95rem;
+        transition: transform 0.15s, opacity 0.15s, box-shadow 0.2s;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+      }
+
+      button:active {
+        transform: scale(0.98);
+      }
+
+      button:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #2563eb, #4f46e5);
+        color: #ffffff;
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+      }
+
+      .btn-ghost {
+        background: #ffffff;
+        color: var(--text);
+        border: 1px solid var(--stroke-strong);
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+      }
+
+      .btn-ghost:hover:not(:disabled) {
+        background: #f8fafc;
+      }
+
+      .btn-export {
+        background: linear-gradient(135deg, #059669, #0d9488);
+        color: #ffffff;
+      }
+
+      .btn-export:hover:not(:disabled) {
+        box-shadow: 0 4px 14px rgba(5, 150, 105, 0.3);
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: flex-end;
+        margin-bottom: 8px;
+      }
+
+      .grow {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 14px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        color: var(--muted);
+        border: 1px solid var(--stroke);
+        background: linear-gradient(180deg, #f8fafc, #f1f5f9);
+      }
+
+      .badge strong {
+        color: var(--accent);
+        font-weight: 700;
+      }
+
+      .msg {
+        margin-top: 12px;
+        font-size: 0.9rem;
+        min-height: 1.2em;
+      }
+
+      .msg.err {
+        color: var(--danger);
+      }
+
+      .msg.ok {
+        color: var(--ok);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+
+      th,
+      td {
+        text-align: left;
+        padding: 12px 10px;
+        border-bottom: 1px solid var(--stroke);
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--muted);
+        font-weight: 600;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        background: linear-gradient(180deg, #f8fafc, #ffffff);
+      }
+
+      tbody tr:hover {
+        background: #f8fafc;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+        word-break: break-word;
+        font-weight: 500;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .btn-sm {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+      }
+
+      .results-head {
+        margin-bottom: 14px;
+      }
+
+      .badges-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+
+      .list-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 14px;
+        padding: 12px 14px;
+        background: #f8fafc;
+        border: 1px solid var(--stroke);
+        border-radius: 12px;
+      }
+
+      .pager-below {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 16px;
+        padding-top: 4px;
+      }
+
+      .list-toolbar-left {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 18px;
+      }
+
+      .filter-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.88rem;
+        color: var(--text);
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .filter-label input {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--accent);
+      }
+
+      .pager {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .page-meta {
+        font-size: 0.88rem;
+        color: var(--muted);
+        min-width: 7.5rem;
+        text-align: center;
+      }
+
+      .list-muted {
+        font-size: 0.82rem;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+
+      .table-scroll {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid var(--stroke);
+        border-radius: 12px;
+        background: #fff;
+      }
+
+      table.result-table {
+        table-layout: fixed;
+        width: 100%;
+        min-width: 920px;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+      }
+
+      table.result-table th,
+      table.result-table td {
+        vertical-align: middle;
+      }
+
+      .cell-clip {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 100%;
+      }
+
+      table.result-table td a.cell-link {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        word-break: normal;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .spinner {
+        width: 18px;
+        height: 18px;
+        border: 2px solid #e2e8f0;
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 8px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+
+      .brand {
+        font-family: Outfit, sans-serif;
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: #334155;
+        letter-spacing: -0.02em;
+      }
+
+      .page {
+        min-height: 100vh;
+      }
+
+      .login-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+
+      .page-login {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 20px 48px;
+        position: relative;
+        overflow: hidden;
+        background: radial-gradient(900px 520px at 15% 20%, rgba(99, 102, 241, 0.18), transparent 55%),
+          radial-gradient(700px 420px at 88% 15%, rgba(14, 165, 233, 0.16), transparent 50%),
+          radial-gradient(600px 400px at 50% 100%, rgba(244, 114, 182, 0.08), transparent 45%),
+          linear-gradient(165deg, #f0f4ff 0%, #f8fafc 38%, #eef2ff 100%);
+      }
+
+      .page-login .wrap {
+        max-width: 460px;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+      }
+
+      .login-decor {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .login-decor::before,
+      .login-decor::after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.55;
+      }
+
+      .login-decor::before {
+        width: 320px;
+        height: 320px;
+        background: rgba(129, 140, 248, 0.35);
+        top: -120px;
+        right: -80px;
+      }
+
+      .login-decor::after {
+        width: 280px;
+        height: 280px;
+        background: rgba(56, 189, 248, 0.28);
+        bottom: -100px;
+        left: -60px;
+      }
+
+      .login-hero {
+        text-align: center;
+        margin-bottom: 28px;
+      }
+
+      .login-mark {
+        width: 52px;
+        height: 52px;
+        margin: 0 auto 16px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #4f46e5, #2563eb);
+        color: #fff;
+        font-size: 1.35rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 12px 32px rgba(37, 99, 235, 0.35);
+      }
+
+      .login-brand {
+        font-size: 1.35rem;
+        letter-spacing: -0.03em;
+        background: linear-gradient(115deg, #0f172a, #3730a3 50%, #2563eb);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .login-tagline {
+        margin: 10px 0 0;
+        font-size: 0.92rem;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .login-card {
+        max-width: 100%;
+        border-radius: 20px;
+        padding: 28px 28px 24px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 24px 48px -12px rgba(30, 58, 138, 0.12);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(12px);
+      }
+
+      .login-welcome {
+        margin: 0 0 6px;
+        font-family: Outfit, sans-serif;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.02em;
+      }
+
+      .login-demo {
+        margin: 0 0 22px;
+        font-size: 0.88rem;
+        color: var(--muted);
+      }
+
+      .login-demo code {
+        font-family: ui-monospace, Consolas, monospace;
+        font-size: 0.85em;
+        color: #1e40af;
+        background: #e0e7ff;
+        padding: 3px 8px;
+        border-radius: 6px;
+        font-weight: 600;
+      }
+
+      .btn-login-wide {
+        width: 100%;
+        margin-top: 4px;
+        padding: 14px 22px;
+        font-size: 1rem;
+      }
+
+      .login-foot {
+        margin-top: 20px;
+        padding-top: 18px;
+        border-top: 1px solid var(--stroke);
+      }
+
+      .hint {
+        margin-top: 20px;
+        padding: 14px 16px;
+        border-radius: 12px;
+        background: #f1f5f9;
+        border: 1px solid var(--stroke);
+        color: var(--muted);
+        font-size: 0.85rem;
+        line-height: 1.6;
+      }
+
+      .hint code {
+        font-family: ui-monospace, Consolas, monospace;
+        font-size: 0.8rem;
+        color: #0f172a;
+        background: #e2e8f0;
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+
+    <!-- 登录页（与搜索页二选一显示） -->
+    <div id="pageLogin" class="page page-login">
+      <div class="login-decor" aria-hidden="true"></div>
+      <div class="wrap">
+        <div class="login-hero">
+          <div class="login-mark" aria-hidden="true">▶</div>
+          <div class="brand login-brand">Twotrees | Influencer Scout</div>
+          <p class="login-tagline">YouTube 关键词视频检索 · 达人信息与导出</p>
+        </div>
+        <section>
+          <div class="card login-card">
+            <p class="login-welcome">欢迎回来</p>
+            <p class="login-demo">演示环境：账号与密码均为 <code>123</code></p>
+            <div class="row">
+              <div>
+                <label>账号</label>
+                <input type="text" id="loginUser" autocomplete="username" value="123" />
+              </div>
+              <div>
+                <label>密码</label>
+                <input type="password" id="loginPass" autocomplete="current-password" value="123" />
+              </div>
+            </div>
+            <div class="actions" style="margin-top: 8px">
+              <button type="button" class="btn-primary btn-login-wide" id="btnLogin">进入工作台</button>
+            </div>
+            <div class="msg" id="loginMsg"></div>
+            <!-- <div class="hint login-foot">
+              <strong style="color: var(--text)">访问 Google 需代理？</strong><br />
+              在 <code>config.json</code> 填写 <code>httpsProxy</code>（如 v2ray 常见
+              <code>http://127.0.0.1:10808</code>），端口以本机软件为准。
+            </div> -->
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- 搜索页（仅登录且路由为 #/app 时显示） -->
+    <div id="pageApp" class="page hidden">
+      <div class="wrap">
+        <div class="topbar">
+          <div class="brand">Twotrees | Influencer Scout</div>
+          <button type="button" class="btn-ghost" id="btnLogout">退出登录</button>
+        </div>
+
+        <section>
+          <h1>YouTube 关键词视频</h1>
+          <p class="sub">
+            使用 YouTube「视频」搜索（<code>type=video</code>）：关键词会匹配<strong>视频标题与说明</strong>等，与频道名无关。结果按视频逐条列出<strong>视频链接</strong>及对应<strong>博主/频道</strong>信息；邮箱来自频道简介（正则 + Gemini）。支持导出 Excel。
+          </p>
+
+          <div class="card">
+            <div class="toolbar">
+              <div class="grow">
+                <label>搜索关键词</label>
+                <input type="text" id="keyword" placeholder="例如：美妆测评、游戏解说…" />
+              </div>
+              <div class="actions" style="margin-top: 24px">
+                <button type="button" class="btn-primary" id="btnSearch">搜索</button>
+              </div>
+            </div>
+            <div class="msg" id="searchMsg"></div>
+          </div>
+
+          <div class="card hidden" id="resultsCard">
+            <div class="results-head">
+              <div class="badges-row">
+                <span class="badge">关键词 <strong id="kwDisplay"></strong></span>
+                <span class="badge">共 <strong id="countDisplay">0</strong> 条视频</span>
+                <span class="badge hidden" id="badgeFiltered"><strong id="filteredCount">0</strong> 条含邮箱（当前列表）</span>
+              </div>
+              <div class="list-toolbar">
+                <div class="list-toolbar-left">
+                  <label class="filter-label"
+                    ><input type="checkbox" id="filterEmail" /> 仅显示有邮箱的</label
+                  >
+                  <label class="filter-label"
+                    ><input type="checkbox" id="exportEmailOnly" /> 导出 Excel 时仅包含有邮箱的</label
+                  >
+                  <span class="list-muted" id="emailSummary"></span>
+                  <button type="button" class="btn-export btn-sm" id="btnExport">导出 Excel</button>
+                </div>
+              </div>
+            </div>
+            <div class="table-scroll">
+              <table class="result-table">
+                <colgroup>
+                  <col style="width: 24%" />
+                  <col style="width: 18%" />
+                  <col style="width: 12%" />
+                  <col style="width: 18%" />
+                  <col style="width: 16%" />
+                  <col style="width: 12%" />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th>视频标题</th>
+                    <th>视频链接</th>
+                    <th>博主（频道）</th>
+                    <th>频道主页</th>
+                    <th>公开邮箱</th>
+                    <th>粉丝数</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody"></tbody>
+              </table>
+            </div>
+            <div class="pager-below">
+              <div class="pager">
+                <button type="button" class="btn-ghost btn-sm" id="btnPrevPage">上一页</button>
+                <span class="page-meta" id="pageMeta">第 1 / 1 页</span>
+                <button type="button" class="btn-ghost btn-sm" id="btnNextPage">下一页</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script>
+      const STORAGE_KEY = 'influencer_token';
+      const HASH_LOGIN = '#/login';
+      const HASH_APP = '#/app';
+
+      const pageLogin = document.getElementById('pageLogin');
+      const pageApp = document.getElementById('pageApp');
+      const loginMsg = document.getElementById('loginMsg');
+      const searchMsg = document.getElementById('searchMsg');
+      const tbody = document.getElementById('tbody');
+      const resultsCard = document.getElementById('resultsCard');
+      const btnExport = document.getElementById('btnExport');
+
+      const PAGE_SIZE = 20;
+      let lastVideos = [];
+      let currentPage = 1;
+
+      function getToken() {
+        return sessionStorage.getItem(STORAGE_KEY) || '';
+      }
+
+      function setToken(t) {
+        if (t) sessionStorage.setItem(STORAGE_KEY, t);
+        else sessionStorage.removeItem(STORAGE_KEY);
+      }
+
+      async function api(path, opts = {}) {
+        const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+        const t = getToken();
+        if (t) headers.Authorization = 'Bearer ' + t;
+        const res = await fetch(path, { ...opts, headers });
+        const ct = res.headers.get('content-type') || '';
+        if (ct.includes('application/json')) {
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || res.statusText);
+          return data;
+        }
+        if (!res.ok) throw new Error(res.statusText);
+        return res;
+      }
+
+      function resetSearchUi() {
+        lastVideos = [];
+        currentPage = 1;
+        const fe = document.getElementById('filterEmail');
+        const ee = document.getElementById('exportEmailOnly');
+        if (fe) fe.checked = false;
+        if (ee) ee.checked = false;
+        const bf = document.getElementById('badgeFiltered');
+        if (bf) bf.classList.add('hidden');
+        searchMsg.textContent = '';
+        searchMsg.innerHTML = '';
+        searchMsg.className = 'msg';
+        const kw = document.getElementById('keyword');
+        if (kw) kw.value = '';
+        tbody.innerHTML = '';
+        resultsCard.classList.add('hidden');
+        document.getElementById('kwDisplay').textContent = '';
+        document.getElementById('countDisplay').textContent = '0';
+        const es = document.getElementById('emailSummary');
+        if (es) es.textContent = '';
+        const pm = document.getElementById('pageMeta');
+        if (pm) pm.textContent = '第 1 / 1 页';
+      }
+
+      function getFilteredVideos() {
+        const list = lastVideos;
+        if (!document.getElementById('filterEmail').checked) return list;
+        return list.filter((r) => r.email && String(r.email).trim());
+      }
+
+      function countWithEmail(arr) {
+        return arr.filter((r) => r.email && String(r.email).trim()).length;
+      }
+
+      function renderVideoRows() {
+        const list = getFilteredVideos();
+        const totalAll = lastVideos.length;
+        const total = list.length;
+        const totalPages = total === 0 ? 1 : Math.ceil(total / PAGE_SIZE);
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+        const start = (currentPage - 1) * PAGE_SIZE;
+        const slice = list.slice(start, start + PAGE_SIZE);
+
+        document.getElementById('countDisplay').textContent = String(totalAll);
+        const emailSummary = document.getElementById('emailSummary');
+        if (emailSummary) {
+          const ne = countWithEmail(lastVideos);
+          emailSummary.textContent = totalAll ? `（全部结果里 ${ne} 条有邮箱）` : '';
+        }
+
+        const filterOn = document.getElementById('filterEmail').checked;
+        const badgeFiltered = document.getElementById('badgeFiltered');
+        const filteredCountEl = document.getElementById('filteredCount');
+        if (badgeFiltered && filteredCountEl) {
+          filteredCountEl.textContent = String(total);
+          badgeFiltered.classList.toggle('hidden', !filterOn);
+        }
+
+        document.getElementById('pageMeta').textContent =
+          total === 0 ? '第 1 / 1 页 · 每页 ' + PAGE_SIZE + ' 条' : '第 ' + currentPage + ' / ' + totalPages + ' 页 · 每页 ' + PAGE_SIZE + ' 条';
+
+        const prev = document.getElementById('btnPrevPage');
+        const next = document.getElementById('btnNextPage');
+        if (prev) prev.disabled = currentPage <= 1 || total === 0;
+        if (next) next.disabled = currentPage >= totalPages || total === 0;
+
+        tbody.innerHTML = '';
+        for (const r of slice) {
+          const tr = document.createElement('tr');
+          const title = r.videoTitle || '';
+          const vurl = r.videoUrl || '';
+          const chn = r.channelName || '';
+          const curl = r.channelUrl || '';
+          const em = r.email && String(r.email).trim() ? r.email : '';
+          tr.innerHTML =
+            '<td class="cell-clip" title="' +
+            escapeAttr(title) +
+            '">' +
+            escapeHtml(title) +
+            '</td><td class="cell-clip" title="' +
+            escapeAttr(vurl) +
+            '"><a class="cell-link" href="' +
+            escapeAttr(vurl) +
+            '" target="_blank" rel="noopener" title="' +
+            escapeAttr(vurl) +
+            '">' +
+            escapeHtml(vurl) +
+            '</a></td><td class="cell-clip" title="' +
+            escapeAttr(chn) +
+            '">' +
+            escapeHtml(chn) +
+            '</td><td class="cell-clip" title="' +
+            escapeAttr(curl) +
+            '"><a class="cell-link" href="' +
+            escapeAttr(curl) +
+            '" target="_blank" rel="noopener" title="' +
+            escapeAttr(curl) +
+            '">' +
+            escapeHtml(curl) +
+            '</a></td><td class="cell-clip" title="' +
+            escapeAttr(em) +
+            '">' +
+            (em ? escapeHtml(em) : '<span style="color:var(--muted)">—</span>') +
+            '</td><td class="cell-clip">' +
+            fmtSubs(r.subscribers) +
+            '</td>';
+          tbody.appendChild(tr);
+        }
+
+        btnExport.disabled = totalAll === 0;
+      }
+
+      function showLoginPage() {
+        resetSearchUi();
+        loginMsg.textContent = '';
+        loginMsg.className = 'msg';
+        pageLogin.classList.remove('hidden');
+        pageApp.classList.add('hidden');
+        const path = location.pathname.replace(/\/$/, '') || '/';
+        if (path !== '/login' || location.hash) {
+          history.replaceState(null, '', '/login');
+        }
+      }
+
+      function showAppPage() {
+        if (!getToken()) {
+          showLoginPage();
+          return;
+        }
+        pageLogin.classList.add('hidden');
+        pageApp.classList.remove('hidden');
+        const path = location.pathname.replace(/\/$/, '') || '/';
+        const target = '/app' + HASH_APP;
+        if (path !== '/app' || location.hash !== HASH_APP) {
+          history.replaceState(null, '', target);
+        }
+      }
+
+      /** 路径 /app 需登录；未登录打开 /app 会整页跳到 /login */
+      function syncRoute() {
+        const token = getToken();
+        const path = location.pathname.replace(/\/$/, '') || '/';
+
+        if (path === '/app' && !token) {
+          window.location.replace('/login');
+          return;
+        }
+
+        if (token) {
+          showAppPage();
+          return;
+        }
+
+        showLoginPage();
+      }
+
+      document.getElementById('btnLogout').onclick = async () => {
+        try {
+          await api('/api/logout', { method: 'POST', body: JSON.stringify({}) });
+        } catch (_) {}
+        setToken('');
+        showLoginPage();
+      };
+
+      document.getElementById('btnLogin').onclick = async () => {
+        loginMsg.textContent = '';
+        loginMsg.className = 'msg';
+        const username = document.getElementById('loginUser').value.trim();
+        const password = document.getElementById('loginPass').value;
+        try {
+          const data = await api('/api/login', {
+            method: 'POST',
+            body: JSON.stringify({ username, password }),
+          });
+          setToken(data.token);
+          resetSearchUi();
+          showAppPage();
+        } catch (e) {
+          loginMsg.textContent = e.message || '登录失败';
+          loginMsg.className = 'msg err';
+        }
+      };
+
+      window.addEventListener('hashchange', syncRoute);
+      window.addEventListener('popstate', syncRoute);
+      syncRoute();
+
+      function fmtSubs(n) {
+        if (n === '' || n == null) return '—';
+        const x = Number(n);
+        if (Number.isNaN(x)) return '—';
+        if (x >= 1e8) return (x / 1e8).toFixed(2) + ' 亿';
+        if (x >= 1e4) return (x / 1e4).toFixed(1) + ' 万';
+        return x.toLocaleString('zh-CN');
+      }
+
+      document.getElementById('btnSearch').onclick = async () => {
+        const q = document.getElementById('keyword').value.trim();
+        searchMsg.innerHTML = '';
+        searchMsg.className = 'msg';
+        resultsCard.classList.add('hidden');
+        lastVideos = [];
+        currentPage = 1;
+
+        if (!q) {
+          searchMsg.textContent = '请输入关键词';
+          searchMsg.className = 'msg err';
+          return;
+        }
+
+        const btn = document.getElementById('btnSearch');
+        btn.disabled = true;
+        searchMsg.innerHTML = '<span class="spinner"></span>正在按关键词搜索视频（分页较多时可能需几十秒）…';
+        searchMsg.className = 'msg ok';
+
+        try {
+          const data = await api('/api/search?q=' + encodeURIComponent(q));
+          lastVideos = data.videos || [];
+          document.getElementById('kwDisplay').textContent = data.keyword || q;
+          currentPage = 1;
+          document.getElementById('filterEmail').checked = false;
+          document.getElementById('exportEmailOnly').checked = false;
+          renderVideoRows();
+          resultsCard.classList.remove('hidden');
+          searchMsg.textContent = data.message || '检索完成';
+          searchMsg.className = 'msg ok';
+        } catch (e) {
+          searchMsg.textContent = e.message || '搜索失败';
+          searchMsg.className = 'msg err';
+        } finally {
+          btn.disabled = false;
+        }
+      };
+
+      function escapeHtml(s) {
+        return String(s)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function escapeAttr(s) {
+        return escapeHtml(s).replace(/'/g, '&#39;');
+      }
+
+      document.getElementById('filterEmail').addEventListener('change', () => {
+        currentPage = 1;
+        renderVideoRows();
+      });
+
+      document.getElementById('btnPrevPage').onclick = () => {
+        if (currentPage > 1) {
+          currentPage--;
+          renderVideoRows();
+        }
+      };
+
+      document.getElementById('btnNextPage').onclick = () => {
+        const list = getFilteredVideos();
+        const tp = list.length === 0 ? 1 : Math.ceil(list.length / PAGE_SIZE);
+        if (currentPage < tp) {
+          currentPage++;
+          renderVideoRows();
+        }
+      };
+
+      btnExport.onclick = async () => {
+        if (!lastVideos.length) return;
+        const exportOnly = document.getElementById('exportEmailOnly').checked;
+        let payload = lastVideos;
+        if (exportOnly) {
+          payload = lastVideos.filter((r) => r.email && String(r.email).trim());
+        }
+        if (!payload.length) {
+          searchMsg.textContent = exportOnly ? '没有含邮箱的记录可导出' : '没有可导出的数据';
+          searchMsg.className = 'msg err';
+          return;
+        }
+        searchMsg.textContent = '';
+        searchMsg.className = 'msg';
+        try {
+          const res = await fetch('/api/export', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Bearer ' + getToken(),
+            },
+            body: JSON.stringify({ videos: payload }),
+          });
+          if (!res.ok) {
+            const j = await res.json().catch(() => ({}));
+            throw new Error(j.error || res.statusText);
+          }
+          const blob = await res.blob();
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = 'youtube-videos.xlsx';
+          a.click();
+          URL.revokeObjectURL(a.href);
+          searchMsg.textContent = '已下载 Excel';
+          searchMsg.className = 'msg ok';
+        } catch (e) {
+          searchMsg.textContent = e.message || '导出失败';
+          searchMsg.className = 'msg err';
+        }
+      };
+    </script>
+  </body>
+</html>
