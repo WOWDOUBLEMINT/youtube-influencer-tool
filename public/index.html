@@ -75,6 +75,7 @@
         grid-template-columns: 1fr auto 1fr;
         align-items: center;
         gap: 8px;
+        overflow: visible;
       }
 
       .nav-left {
@@ -87,9 +88,185 @@
         justify-self: center;
       }
 
+      .nav-center-inner {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+
       .nav-right {
         justify-self: end;
         padding-right: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        position: relative;
+        overflow: visible;
+      }
+
+      .route-view.hidden {
+        display: none !important;
+      }
+
+      .history-page-section {
+        min-height: calc(100vh - 72px);
+        min-height: calc(100dvh - 72px);
+        padding: calc(var(--nav-h) + 36px) 0 72px;
+      }
+
+      .history-page-inner {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 0 22px;
+      }
+
+      .history-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-family: Outfit, system-ui, sans-serif;
+        font-weight: 700;
+        font-size: 0.88rem;
+        color: var(--ink);
+        text-decoration: none;
+        margin-bottom: 22px;
+        padding: 8px 0;
+      }
+
+      .history-back:hover {
+        text-decoration: underline;
+      }
+
+      .history-page-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .history-page-title {
+        font-family: Outfit, system-ui, sans-serif;
+        font-weight: 900;
+        font-size: clamp(1.5rem, 4vw, 2rem);
+        letter-spacing: -0.02em;
+        margin: 0;
+        color: var(--ink);
+        flex: 1;
+        min-width: min(100%, 200px);
+      }
+
+      .btn-clear-history {
+        font-family: Outfit, system-ui, sans-serif;
+        font-weight: 700;
+        font-size: 0.82rem;
+        padding: 9px 16px;
+        border-radius: 999px;
+        border: 1px solid rgba(190, 18, 60, 0.4);
+        background: rgba(255, 255, 255, 0.95);
+        color: var(--danger);
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s;
+        flex-shrink: 0;
+      }
+
+      .btn-clear-history:hover:not(:disabled) {
+        background: #fff1f2;
+        border-color: rgba(190, 18, 60, 0.55);
+      }
+
+      .btn-clear-history:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+
+      .history-page-lead {
+        margin: 0 0 28px;
+        color: var(--muted);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        max-width: 40rem;
+      }
+
+      .history-page-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .history-card {
+        background: var(--card);
+        border: 1px solid var(--stroke);
+        border-radius: var(--radius);
+        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+        padding: 16px 18px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+      }
+
+      .history-card-main {
+        flex: 1;
+        min-width: min(100%, 200px);
+      }
+
+      .history-card-kw {
+        font-family: Outfit, system-ui, sans-serif;
+        font-weight: 800;
+        font-size: 1.05rem;
+        color: var(--ink);
+        line-height: 1.3;
+        word-break: break-word;
+      }
+
+      .history-card-meta {
+        margin-top: 6px;
+        font-size: 0.84rem;
+        color: var(--muted);
+        font-weight: 500;
+      }
+
+      .history-card-count {
+        font-size: 0.78rem;
+        color: #64748b;
+        font-weight: 600;
+        margin-top: 4px;
+      }
+
+      .btn-history-open {
+        font-family: Outfit, system-ui, sans-serif;
+        font-weight: 700;
+        font-size: 0.88rem;
+        padding: 10px 18px;
+        border-radius: 999px;
+        border: none;
+        cursor: pointer;
+        background: var(--ink);
+        color: #fff;
+        transition: transform 0.12s, box-shadow 0.2s;
+        flex-shrink: 0;
+      }
+
+      .btn-history-open:hover {
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-history-open:active {
+        transform: scale(0.98);
+      }
+
+      .history-empty-card {
+        padding: 28px 22px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.95rem;
+        line-height: 1.55;
       }
 
       .nav-logo-wrap {
@@ -127,7 +304,7 @@
         }
       }
 
-      .nav-home {
+      .nav-main-link {
         font-family: Outfit, system-ui, sans-serif;
         font-weight: 700;
         font-size: 0.95rem;
@@ -136,10 +313,12 @@
         padding: 10px 18px;
         border-radius: 999px;
         transition: background 0.2s;
+        white-space: nowrap;
       }
 
-      .nav-home:hover {
+      .nav-main-link:hover {
         background: rgba(255, 255, 255, 0.1);
+        color: var(--nav-text);
       }
 
       .lang-toggle {
@@ -633,6 +812,54 @@
         }
       }
 
+      .cache-tags-wrap {
+        margin-top: 18px;
+        padding-top: 16px;
+        border-top: 1px solid var(--stroke);
+      }
+
+      .cache-tags-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+        margin-bottom: 10px;
+      }
+
+      .cache-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .cache-tag {
+        font-family: Outfit, system-ui, sans-serif;
+        font-weight: 600;
+        font-size: 0.82rem;
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        background: #fafafa;
+        color: var(--ink);
+        cursor: pointer;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        transition: background 0.15s, border-color 0.15s, transform 0.12s;
+      }
+
+      .cache-tag:hover {
+        background: #fff;
+        border-color: rgba(15, 23, 42, 0.22);
+      }
+
+      .cache-tag:active {
+        transform: scale(0.98);
+      }
+
       .results-head {
         margin-bottom: 14px;
       }
@@ -642,7 +869,7 @@
     <header class="nav-shell">
       <nav class="nav-pill" aria-label="Main navigation">
         <div class="nav-left">
-          <a class="nav-logo-link" href="#hero" title="Two Trees">
+          <a class="nav-logo-link" href="#/" title="Two Trees">
             <span class="nav-logo-wrap">
               <img
                 class="nav-logo"
@@ -657,7 +884,10 @@
           </a>
         </div>
         <div class="nav-center">
-          <a class="nav-home" href="#hero" data-i18n="navHome">Home</a>
+          <div class="nav-center-inner">
+            <a class="nav-main-link" href="#/" data-i18n="navHome">Home</a>
+            <a class="nav-main-link" href="#/history" id="navHistoryLink" data-i18n="navHistory">History</a>
+          </div>
         </div>
         <div class="nav-right">
           <div class="lang-toggle" role="group" aria-label="Language">
@@ -669,6 +899,7 @@
     </header>
 
     <main>
+      <div id="routeHome" class="route-view">
       <section class="hero" id="hero">
         <div class="hero-deco" aria-hidden="true">
           <span class="hero-pill hero-pill--a">Creator</span>
@@ -678,7 +909,7 @@
         <h1 class="hero-title" data-i18n="heroTitle"></h1>
         <p class="hero-sub" data-i18n="heroSub"></p>
         <div class="hero-scroll">
-          <a class="hero-scroll-link" href="#search" data-i18n="scrollToSearch">Scroll to search</a>
+          <a class="hero-scroll-link" href="#/search" data-i18n="scrollToSearch">Scroll to search</a>
         </div>
       </section>
 
@@ -698,6 +929,10 @@
               </div>
             </div>
             <div class="msg" id="searchMsg"></div>
+            <div id="cacheTagsWrap" class="cache-tags-wrap hidden">
+              <div class="cache-tags-label" data-i18n="cacheTagsLabel"></div>
+              <div id="cacheTags" class="cache-tags"></div>
+            </div>
           </div>
 
           <div class="card hidden" id="resultsCard">
@@ -761,6 +996,28 @@
           </div>
         </div>
       </section>
+      </div>
+
+      <div id="routeHistory" class="route-view hidden">
+        <section class="history-page-section" aria-label="Search history page">
+          <div class="history-page-inner">
+            <a href="#/" class="history-back" data-i18n="historyBack">← Back to home</a>
+            <div class="history-page-head">
+              <h1 class="history-page-title" data-i18n="historyPageTitle">Search history</h1>
+              <button type="button" class="btn-clear-history" id="btnClearAllHistory" data-i18n="historyClearAll">
+                Clear all
+              </button>
+            </div>
+            <!-- <p class="history-page-lead" data-i18n="historyPageLead"></p> -->
+            <div id="historyPageEmptyWrap" class="hidden">
+              <div class="card">
+                <p class="history-empty-card" id="historyPageEmpty" data-i18n="historyEmpty"></p>
+              </div>
+            </div>
+            <div id="historyPageList" class="history-page-list"></div>
+          </div>
+        </section>
+      </div>
     </main>
 
     <script>
@@ -769,6 +1026,17 @@
       const STR = {
         en: {
           navHome: 'Home',
+          navHistory: 'History',
+          historyBack: '← Back to home',
+          historyPageTitle: 'Search history',
+          historyPageLead:
+            'Snapshots from successful searches on this device. Open one to restore the full list — filters and Excel export work the same as after a live search.',
+          historyEmpty: 'No saved searches with results yet.',
+          historyCount: '{n} videos',
+          historyOpenBtn: 'Open results',
+          historyClearAll: 'Clear all',
+          historyClearConfirm: 'Remove all search history from this browser? This cannot be undone.',
+          loadedFromHistory: 'Restored this snapshot from history — filter and export work as usual.',
           heroTitle: 'Find creators\nfrom YouTube\nvideo search',
           heroSub:
             'Keyword-matched videos, channel profiles, public emails from descriptions, and one-click Excel export — built for teams who source influencers fast.',
@@ -806,9 +1074,22 @@
           pageEmpty: 'Page 1 / 1 · {n} per page',
           pageOf: 'Page {cur} / {tot} · {n} per page',
           emailSummary: '({ne} of {all} with email)',
+          cacheTagsLabel: "Today's cached keywords",
+          fromCache: "Loaded from today's local cache (no API call).",
         },
         zh: {
           navHome: '首页',
+          navHistory: '搜索历史',
+          historyBack: '← 返回首页',
+          historyPageTitle: '搜索历史',
+          historyPageLead:
+            '本机已成功搜索并保存的快照。打开任一条可恢复当时的完整列表，筛选与导出 Excel 与在线搜索后一致。',
+          historyEmpty: '暂无已保存结果的搜索记录。',
+          historyCount: '{n} 条视频',
+          historyOpenBtn: '打开结果',
+          historyClearAll: '清除全部',
+          historyClearConfirm: '确定清除本浏览器中的全部搜索历史？此操作不可恢复。',
+          loadedFromHistory: '已从历史记录恢复该次列表，筛选与导出与线上一致。',
           heroTitle: '用 YouTube\n视频搜索\n发现达人',
           heroSub:
             '按关键词匹配视频与频道、从简介提取公开邮箱，并支持一键导出 Excel，适合需要快速建联与筛选达人的团队。',
@@ -846,6 +1127,8 @@
           pageEmpty: '第 1 / 1 页 · 每页 {n} 条',
           pageOf: '第 {cur} / {tot} 页 · 每页 {n} 条',
           emailSummary: '（全部 {all} 条里 {ne} 条有邮箱）',
+          cacheTagsLabel: '今日已缓存的关键词',
+          fromCache: '已使用今日本地缓存，未请求接口。',
         },
       };
 
@@ -877,6 +1160,8 @@
         localStorage.setItem(LANG_KEY, lang);
         document.title =
           lang === 'zh' ? '达人检索 — YouTube 搜索' : 'Influencer Scout — YouTube search';
+        renderCacheTags();
+        renderHistoryPage();
       }
 
       const searchMsg = document.getElementById('searchMsg');
@@ -887,6 +1172,275 @@
       const PAGE_SIZE = 20;
       let lastVideos = [];
       let currentPage = 1;
+
+      const CACHE_STORAGE_KEY = 'influencer_search_day_cache_v1';
+      const CACHE_MAX_ENTRIES = 20;
+
+      function localCalendarDay() {
+        const d = new Date();
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+      }
+
+      function normalizeCacheKey(q) {
+        return String(q || '')
+          .trim()
+          .replace(/\s+/g, ' ')
+          .toLowerCase();
+      }
+
+      function loadDayCache() {
+        try {
+          const raw = localStorage.getItem(CACHE_STORAGE_KEY);
+          if (!raw) return { day: localCalendarDay(), byKey: {} };
+          const o = JSON.parse(raw);
+          if (!o || typeof o !== 'object') return { day: localCalendarDay(), byKey: {} };
+          if (o.day !== localCalendarDay()) return { day: localCalendarDay(), byKey: {} };
+          return { day: o.day, byKey: o.byKey && typeof o.byKey === 'object' ? o.byKey : {} };
+        } catch {
+          return { day: localCalendarDay(), byKey: {} };
+        }
+      }
+
+      function pruneOldestEntries(byKey, maxKeep) {
+        const keys = Object.keys(byKey);
+        if (keys.length <= maxKeep) return byKey;
+        const ranked = keys
+          .map((k) => ({ k, at: Number(byKey[k].at) || 0 }))
+          .sort((a, b) => a.at - b.at);
+        const drop = keys.length - maxKeep;
+        for (let i = 0; i < drop; i++) delete byKey[ranked[i].k];
+        return byKey;
+      }
+
+      function persistDayCache(data) {
+        const payload = JSON.stringify({ day: data.day, byKey: data.byKey });
+        try {
+          localStorage.setItem(CACHE_STORAGE_KEY, payload);
+        } catch (e) {
+          if (e && e.name === 'QuotaExceededError') {
+            pruneOldestEntries(data.byKey, Math.max(3, Math.floor(CACHE_MAX_ENTRIES / 2)));
+            try {
+              localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify({ day: data.day, byKey: data.byKey }));
+            } catch (_) {}
+          }
+        }
+      }
+
+      function writeCacheEntry(keyNorm, entry) {
+        const data = loadDayCache();
+        data.day = localCalendarDay();
+        data.byKey[keyNorm] = {
+          keywordDisplay: entry.keywordDisplay,
+          videos: Array.isArray(entry.videos) ? entry.videos : [],
+          message: entry.message || '',
+          at: Date.now(),
+        };
+        pruneOldestEntries(data.byKey, CACHE_MAX_ENTRIES);
+        persistDayCache(data);
+      }
+
+      function readCacheEntry(keyNorm) {
+        const data = loadDayCache();
+        const hit = data.byKey[keyNorm];
+        if (!hit || !Array.isArray(hit.videos)) return null;
+        return hit;
+      }
+
+      function renderCacheTags() {
+        const wrap = document.getElementById('cacheTagsWrap');
+        const row = document.getElementById('cacheTags');
+        if (!wrap || !row) return;
+        const data = loadDayCache();
+        const pairs = Object.entries(data.byKey);
+        if (!pairs.length) {
+          wrap.classList.add('hidden');
+          row.innerHTML = '';
+          return;
+        }
+        wrap.classList.remove('hidden');
+        pairs.sort((a, b) => (Number(b[1].at) || 0) - (Number(a[1].at) || 0));
+        row.innerHTML = '';
+        for (const [k, v] of pairs) {
+          const label = (v.keywordDisplay || k || '').trim();
+          if (!label) continue;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'cache-tag';
+          btn.textContent = label;
+          btn.setAttribute('aria-label', label);
+          btn.onclick = () => {
+            document.getElementById('keyword').value = label;
+            document.getElementById('btnSearch').click();
+          };
+          row.appendChild(btn);
+        }
+      }
+
+      const HISTORY_STORAGE_KEY = 'influencer_search_history_v1';
+      const HISTORY_MAX_ITEMS = 40;
+
+      function cloneVideosForHistory(videos) {
+        try {
+          if (typeof structuredClone === 'function') return structuredClone(videos);
+        } catch (_) {}
+        return JSON.parse(JSON.stringify(videos));
+      }
+
+      function loadHistoryItems() {
+        try {
+          const raw = localStorage.getItem(HISTORY_STORAGE_KEY);
+          if (!raw) return [];
+          const arr = JSON.parse(raw);
+          if (!Array.isArray(arr)) return [];
+          return arr.filter(
+            (x) => x && x.id && typeof x.keyword === 'string' && Array.isArray(x.videos) && x.videos.length > 0
+          );
+        } catch {
+          return [];
+        }
+      }
+
+      function persistHistoryItems(items) {
+        const trimmed = items.slice(0, HISTORY_MAX_ITEMS);
+        try {
+          localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(trimmed));
+        } catch (e) {
+          if (e && e.name === 'QuotaExceededError' && trimmed.length > 4) {
+            persistHistoryItems(trimmed.slice(0, Math.floor(trimmed.length / 2)));
+          }
+        }
+      }
+
+      function appendHistoryEntry({ keyword, videos }) {
+        if (!keyword || !Array.isArray(videos) || !videos.length) return;
+        const items = loadHistoryItems();
+        items.unshift({
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
+          keyword,
+          at: Date.now(),
+          videos: cloneVideosForHistory(videos),
+        });
+        persistHistoryItems(items);
+        renderHistoryPage();
+      }
+
+      function formatHistoryDate(ts) {
+        const d = new Date(Number(ts) || 0);
+        if (lang === 'zh') {
+          return d.toLocaleString('zh-CN', { dateStyle: 'medium', timeStyle: 'short' });
+        }
+        return d.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+      }
+
+      function parseHashRoute() {
+        let raw = (location.hash || '').replace(/^#/, '').trim();
+        if (raw.startsWith('/')) raw = raw.slice(1).trim();
+        if (!raw) return { route: 'home', scrollSearch: false };
+        if (raw === 'history') return { route: 'history', scrollSearch: false };
+        if (raw === 'search') return { route: 'home', scrollSearch: true };
+        if (raw === 'home') return { route: 'home', scrollSearch: false };
+        return { route: 'home', scrollSearch: false };
+      }
+
+      function syncRoute() {
+        const { route, scrollSearch } = parseHashRoute();
+        const home = document.getElementById('routeHome');
+        const hist = document.getElementById('routeHistory');
+        if (!home || !hist) return;
+        if (route === 'history') {
+          home.classList.add('hidden');
+          hist.classList.remove('hidden');
+          renderHistoryPage();
+          window.scrollTo(0, 0);
+        } else {
+          hist.classList.add('hidden');
+          home.classList.remove('hidden');
+          if (scrollSearch) {
+            queueMicrotask(() => {
+              document.getElementById('search')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+          }
+        }
+      }
+
+      function applyHistoryEntry(id) {
+        const entry = loadHistoryItems().find((x) => x.id === id);
+        if (!entry || !Array.isArray(entry.videos)) return;
+        lastVideos = cloneVideosForHistory(entry.videos);
+        const kw = entry.keyword || '';
+        document.getElementById('keyword').value = kw;
+        document.getElementById('kwDisplay').textContent = kw;
+        currentPage = 1;
+        document.getElementById('filterEmail').checked = false;
+        document.getElementById('exportEmailOnly').checked = false;
+        renderVideoRows();
+        resultsCard.classList.remove('hidden');
+        searchMsg.textContent = T('loadedFromHistory');
+        searchMsg.className = 'msg ok';
+        if (parseHashRoute().route === 'history') {
+          location.hash = '#/search';
+        } else {
+          document.getElementById('search')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+
+      function renderHistoryPage() {
+        const listEl = document.getElementById('historyPageList');
+        const emptyWrap = document.getElementById('historyPageEmptyWrap');
+        const clearBtn = document.getElementById('btnClearAllHistory');
+        if (!listEl || !emptyWrap) return;
+        const items = loadHistoryItems();
+        listEl.innerHTML = '';
+        if (clearBtn) clearBtn.disabled = items.length === 0;
+        if (!items.length) {
+          emptyWrap.classList.remove('hidden');
+          return;
+        }
+        emptyWrap.classList.add('hidden');
+        for (const item of items) {
+          const card = document.createElement('div');
+          card.className = 'history-card';
+          const main = document.createElement('div');
+          main.className = 'history-card-main';
+          const kwEl = document.createElement('div');
+          kwEl.className = 'history-card-kw';
+          kwEl.textContent = item.keyword || '';
+          const meta = document.createElement('div');
+          meta.className = 'history-card-meta';
+          meta.textContent = formatHistoryDate(item.at);
+          const cnt = document.createElement('div');
+          cnt.className = 'history-card-count';
+          cnt.textContent = T('historyCount', { n: item.videos.length });
+          main.appendChild(kwEl);
+          main.appendChild(meta);
+          main.appendChild(cnt);
+          const openBtn = document.createElement('button');
+          openBtn.type = 'button';
+          openBtn.className = 'btn-history-open';
+          openBtn.textContent = T('historyOpenBtn');
+          openBtn.onclick = () => applyHistoryEntry(item.id);
+          card.appendChild(main);
+          card.appendChild(openBtn);
+          listEl.appendChild(card);
+        }
+      }
+
+      function clearAllSearchHistory() {
+        const items = loadHistoryItems();
+        if (!items.length) return;
+        if (!confirm(T('historyClearConfirm'))) return;
+        try {
+          localStorage.removeItem(HISTORY_STORAGE_KEY);
+        } catch (_) {
+          persistHistoryItems([]);
+        }
+        renderHistoryPage();
+      }
+
+      document.getElementById('btnClearAllHistory').onclick = () => clearAllSearchHistory();
 
       document.getElementById('langEn').onclick = () => {
         lang = 'en';
@@ -1038,7 +1592,14 @@
         }
       })();
 
+      if (!location.hash || location.hash === '#') {
+        history.replaceState(null, '', '#/');
+      }
+
+      window.addEventListener('hashchange', syncRoute);
+
       applyLang();
+      syncRoute();
 
       document.getElementById('keyword').addEventListener('keydown', (e) => {
         if (e.key === 'Enter') document.getElementById('btnSearch').click();
@@ -1076,6 +1637,22 @@
         }
 
         const btn = document.getElementById('btnSearch');
+        const keyNorm = normalizeCacheKey(q);
+        const cached = readCacheEntry(keyNorm);
+        if (cached) {
+          lastVideos = cached.videos;
+          document.getElementById('kwDisplay').textContent = cached.keywordDisplay || q;
+          currentPage = 1;
+          document.getElementById('filterEmail').checked = false;
+          document.getElementById('exportEmailOnly').checked = false;
+          renderVideoRows();
+          resultsCard.classList.remove('hidden');
+          searchMsg.textContent = T('fromCache');
+          searchMsg.className = 'msg ok';
+          renderCacheTags();
+          return;
+        }
+
         btn.disabled = true;
         searchMsg.innerHTML = '<span class="spinner"></span>' + T('searching');
         searchMsg.className = 'msg ok';
@@ -1083,7 +1660,8 @@
         try {
           const data = await api('/api/search?q=' + encodeURIComponent(q));
           lastVideos = data.videos || [];
-          document.getElementById('kwDisplay').textContent = data.keyword || q;
+          const displayKw = data.keyword || q;
+          document.getElementById('kwDisplay').textContent = displayKw;
           currentPage = 1;
           document.getElementById('filterEmail').checked = false;
           document.getElementById('exportEmailOnly').checked = false;
@@ -1091,6 +1669,15 @@
           resultsCard.classList.remove('hidden');
           searchMsg.textContent = data.message || T('done');
           searchMsg.className = 'msg ok';
+          writeCacheEntry(keyNorm, {
+            keywordDisplay: displayKw,
+            videos: lastVideos,
+            message: data.message || '',
+          });
+          renderCacheTags();
+          if (lastVideos.length > 0) {
+            appendHistoryEntry({ keyword: displayKw, videos: lastVideos });
+          }
         } catch (e) {
           searchMsg.textContent = e.message || T('errSearch');
           searchMsg.className = 'msg err';
