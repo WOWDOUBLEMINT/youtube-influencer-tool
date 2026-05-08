@@ -6,7 +6,7 @@
     <title>Influencer Scout — YouTube search</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://twotrees3d.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.shopify.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Outfit:wght@500;600;700;800;900&display=swap"
       rel="stylesheet"
@@ -23,12 +23,13 @@
         --accent-soft: #f4f4f5;
         --danger: #be123c;
         --ok: #047857;
-        --pill: #0a0a0a;
-        --nav-border: rgba(255, 255, 255, 0.1);
-        --nav-text: #f8fafc;
-        --nav-muted: rgba(248, 250, 252, 0.65);
+        --pill: #ffffff;
+        --nav-border: rgba(15, 23, 42, 0.1);
+        --nav-text: #0f172a;
+        --nav-muted: #64748b;
         --radius: 20px;
-        --nav-h: 56px;
+        --nav-h: 42px;
+        --nav-shell-y: 10px;
       }
 
       * {
@@ -56,7 +57,7 @@
         left: 0;
         right: 0;
         z-index: 100;
-        padding: 18px 16px 0;
+        padding: var(--nav-shell-y) 14px 0;
         display: flex;
         justify-content: center;
         pointer-events: none;
@@ -66,11 +67,11 @@
         pointer-events: auto;
         width: min(960px, calc(100% - 8px));
         min-height: var(--nav-h);
-        padding: 8px 10px 8px 12px;
+        padding: 0 20px;
         background: var(--pill);
         border-radius: 999px;
         border: 1px solid var(--nav-border);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), 0 2px 12px rgba(0, 0, 0, 0.25);
+        box-shadow: 0 8px 32px rgba(15, 23, 42, 0.08), 0 2px 10px rgba(15, 23, 42, 0.05);
         display: grid;
         grid-template-columns: 1fr auto 1fr;
         align-items: center;
@@ -112,9 +113,9 @@
       }
 
       .history-page-section {
-        min-height: calc(100vh - 72px);
-        min-height: calc(100dvh - 72px);
-        padding: calc(var(--nav-h) + 36px) 0 72px;
+        min-height: calc(100vh - 58px);
+        min-height: calc(100dvh - 58px);
+        padding: calc(var(--nav-shell-y) + var(--nav-h) + 24px) 0 72px;
       }
 
       .history-page-inner {
@@ -274,8 +275,8 @@
         align-items: center;
         justify-content: center;
         background: transparent;
-        border-radius: 14px;
-        padding: 6px 10px 6px 4px;
+        border-radius: 10px;
+        padding: 2px 6px 2px 2px;
         line-height: 0;
       }
 
@@ -289,9 +290,9 @@
       }
 
       .nav-logo {
-        height: 26px;
+        height: 28px;
         width: auto;
-        max-width: min(160px, 36vw);
+        max-width: min(112px, 36vw);
         object-fit: contain;
         object-position: left center;
         display: block;
@@ -299,42 +300,42 @@
 
       @media (min-width: 480px) {
         .nav-logo {
-          height: 30px;
-          max-width: 180px;
+          height: 55px;
+          max-width: 120px;
         }
       }
 
       .nav-main-link {
-        font-family: Outfit, system-ui, sans-serif;
-        font-weight: 700;
-        font-size: 0.95rem;
+        font-family: 'DM Sans', system-ui, sans-serif;
+        font-weight: 400;
+        font-size: 0.9rem;
         color: var(--nav-text);
         text-decoration: none;
-        padding: 10px 18px;
+        padding: 6px 14px;
         border-radius: 999px;
         transition: background 0.2s;
         white-space: nowrap;
       }
 
       .nav-main-link:hover {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(15, 23, 42, 0.06);
         color: var(--nav-text);
       }
 
       .lang-toggle {
         display: inline-flex;
-        padding: 3px;
+        padding: 2px;
         border-radius: 999px;
-        background: rgba(255, 255, 255, 0.08);
+        background: #f1f5f9;
         border: 1px solid var(--nav-border);
-        gap: 2px;
+        gap: 1px;
       }
 
       .lang-btn {
-        font-family: Outfit, system-ui, sans-serif;
-        font-weight: 600;
-        font-size: 0.78rem;
-        padding: 8px 12px;
+        font-family: 'DM Sans', system-ui, sans-serif;
+        font-weight: 400;
+        font-size: 0.75rem;
+        padding: 5px 10px;
         border: none;
         border-radius: 999px;
         cursor: pointer;
@@ -349,8 +350,8 @@
 
       .lang-btn.active {
         background: #fff;
-        color: #0a0a0a;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+        color: var(--nav-text);
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
       }
 
       .hero {
@@ -361,7 +362,7 @@
         align-items: center;
         justify-content: center;
         text-align: center;
-        padding: calc(var(--nav-h) + 48px) 22px 48px;
+        padding: calc(var(--nav-shell-y) + var(--nav-h) + 32px) 22px 48px;
         position: relative;
         overflow: hidden;
       }
@@ -527,7 +528,6 @@
         text-transform: uppercase;
         letter-spacing: 0.08em;
         color: var(--muted);
-        margin-bottom: 8px;
         font-weight: 700;
       }
 
@@ -873,9 +873,9 @@
             <span class="nav-logo-wrap">
               <img
                 class="nav-logo"
-                src="https://twotrees3d.com/cdn/shop/files/logo_1c806b7f-262b-463d-826b-790ffb4882b4.png?v=1751007669&amp;width=500"
-                width="200"
-                height="54"
+                src="https://cdn.shopify.com/s/files/1/0928/2859/8586/files/TT-LOGO_160-160.png?v=1752197026"
+                width="140"
+                height="160"
                 alt="Two Trees"
                 decoding="async"
                 fetchpriority="high"
