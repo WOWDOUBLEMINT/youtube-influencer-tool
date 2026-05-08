@@ -1,162 +1,411 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>YouTube 关键词视频</title>
+    <title>Influencer Scout — YouTube search</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://twotrees3d.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Outfit:wght@500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Outfit:wght@500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
     <style>
       :root {
-        --bg0: #f8fafc;
-        --bg1: #eef2ff;
+        --page-bg: #fde2ec;
+        --page-bg2: #fce4f0;
+        --ink: #0a0a0a;
+        --muted: #4a4a4a;
         --card: #ffffff;
-        --stroke: #e2e8f0;
-        --stroke-strong: #cbd5e1;
-        --text: #0f172a;
-        --muted: #64748b;
-        --accent: #2563eb;
-        --accent-soft: #dbeafe;
-        --danger: #e11d48;
-        --ok: #059669;
-        --radius: 16px;
-        --shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 20px 40px -12px rgba(15, 23, 42, 0.12);
-        --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.06), 0 12px 32px rgba(37, 99, 235, 0.08);
+        --stroke: rgba(15, 23, 42, 0.08);
+        --accent: #111111;
+        --accent-soft: #f4f4f5;
+        --danger: #be123c;
+        --ok: #047857;
+        --pill: #0a0a0a;
+        --nav-border: rgba(255, 255, 255, 0.1);
+        --nav-text: #f8fafc;
+        --nav-muted: rgba(248, 250, 252, 0.65);
+        --radius: 20px;
+        --nav-h: 56px;
       }
 
       * {
         box-sizing: border-box;
       }
 
+      html {
+        scroll-behavior: smooth;
+      }
+
       body {
         margin: 0;
         min-height: 100vh;
         font-family: 'DM Sans', system-ui, sans-serif;
-        color: var(--text);
-        background: radial-gradient(1000px 520px at 8% -5%, rgba(147, 197, 253, 0.45), transparent 55%),
-          radial-gradient(800px 480px at 92% 0%, rgba(196, 181, 253, 0.35), transparent 50%),
-          linear-gradient(180deg, var(--bg0) 0%, #f1f5f9 40%, var(--bg1) 100%);
+        color: var(--ink);
+        background: var(--page-bg);
+        background-image: radial-gradient(1200px 600px at 50% -10%, rgba(255, 255, 255, 0.65), transparent 55%),
+          radial-gradient(900px 500px at 100% 40%, rgba(253, 186, 210, 0.45), transparent 50%),
+          radial-gradient(700px 400px at 0% 80%, rgba(233, 213, 255, 0.35), transparent 45%);
       }
 
-      .noise {
-        pointer-events: none;
+      .nav-shell {
         position: fixed;
-        inset: 0;
-        opacity: 0.025;
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        padding: 18px 16px 0;
+        display: flex;
+        justify-content: center;
+        pointer-events: none;
       }
 
-      .wrap {
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 40px 20px 56px;
+      .nav-pill {
+        pointer-events: auto;
+        width: min(960px, calc(100% - 8px));
+        min-height: var(--nav-h);
+        padding: 8px 10px 8px 12px;
+        background: var(--pill);
+        border-radius: 999px;
+        border: 1px solid var(--nav-border);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), 0 2px 12px rgba(0, 0, 0, 0.25);
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .nav-left {
+        justify-self: start;
+        display: flex;
+        align-items: center;
+      }
+
+      .nav-center {
+        justify-self: center;
+      }
+
+      .nav-right {
+        justify-self: end;
+        padding-right: 6px;
+      }
+
+      .nav-logo-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border-radius: 14px;
+        padding: 6px 10px 6px 4px;
+        line-height: 0;
+      }
+
+      .nav-logo-link {
+        border-radius: 10px;
+        outline-offset: 3px;
+      }
+
+      .nav-logo-link:focus-visible {
+        outline: 2px solid rgba(96, 165, 250, 0.95);
+      }
+
+      .nav-logo {
+        height: 26px;
+        width: auto;
+        max-width: min(160px, 36vw);
+        object-fit: contain;
+        object-position: left center;
+        display: block;
+      }
+
+      @media (min-width: 480px) {
+        .nav-logo {
+          height: 30px;
+          max-width: 180px;
+        }
+      }
+
+      .nav-home {
+        font-family: Outfit, system-ui, sans-serif;
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: var(--nav-text);
+        text-decoration: none;
+        padding: 10px 18px;
+        border-radius: 999px;
+        transition: background 0.2s;
+      }
+
+      .nav-home:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .lang-toggle {
+        display: inline-flex;
+        padding: 3px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid var(--nav-border);
+        gap: 2px;
+      }
+
+      .lang-btn {
+        font-family: Outfit, system-ui, sans-serif;
+        font-weight: 600;
+        font-size: 0.78rem;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 999px;
+        cursor: pointer;
+        background: transparent;
+        color: var(--nav-muted);
+        transition: background 0.2s, color 0.2s;
+      }
+
+      .lang-btn:hover {
+        color: var(--nav-text);
+      }
+
+      .lang-btn.active {
+        background: #fff;
+        color: #0a0a0a;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .hero {
+        min-height: 90vh;
+        min-height: 90dvh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: calc(var(--nav-h) + 48px) 22px 48px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero-deco {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .hero-pill {
+        position: absolute;
+        font-family: Outfit, system-ui, sans-serif;
+        font-weight: 700;
+        font-size: 0.72rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 8px 14px;
+        border-radius: 999px;
+        color: #fff;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+      }
+
+      .hero-pill--a {
+        top: 22%;
+        left: 8%;
+        background: linear-gradient(135deg, #7c3aed, #5b21b6);
+        transform: rotate(-8deg);
+      }
+
+      .hero-pill--b {
+        top: 28%;
+        right: 10%;
+        background: linear-gradient(135deg, #db2777, #9d174d);
+        transform: rotate(6deg);
+      }
+
+      .hero-pill--c {
+        bottom: 38%;
+        left: 14%;
+        background: linear-gradient(135deg, #ea580c, #c2410c);
+        transform: rotate(5deg);
+      }
+
+      @media (max-width: 640px) {
+        .hero-pill {
+          display: none;
+        }
+      }
+
+      .hero-title {
+        font-family: Outfit, system-ui, sans-serif;
+        font-weight: 900;
+        font-size: clamp(2.1rem, 7vw, 4.25rem);
+        line-height: 0.98;
+        letter-spacing: -0.03em;
+        text-transform: uppercase;
+        color: var(--ink);
+        margin: 0;
+        max-width: 20ch;
+        position: relative;
+        z-index: 1;
+        white-space: pre-line;
+      }
+
+      @media (min-width: 768px) {
+        .hero-title {
+          max-width: 24ch;
+          font-size: clamp(2.75rem, 6.5vw, 4.6rem);
+        }
+      }
+
+      .hero-sub {
+        margin: 28px 0 0;
+        max-width: 36rem;
+        font-size: clamp(0.95rem, 2.1vw, 1.15rem);
+        line-height: 1.65;
+        color: var(--muted);
+        font-weight: 500;
         position: relative;
         z-index: 1;
       }
 
-      h1 {
+      .hero-scroll {
+        margin-top: 40px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .hero-scroll-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
         font-family: Outfit, system-ui, sans-serif;
         font-weight: 700;
-        letter-spacing: -0.03em;
-        font-size: clamp(1.75rem, 4vw, 2.35rem);
-        margin: 0 0 8px;
-        background: linear-gradient(115deg, #0f172a 0%, #1e3a8a 42%, #2563eb 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
+        font-size: 0.88rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--ink);
+        text-decoration: none;
+        padding: 14px 26px;
+        border-radius: 999px;
+        background: var(--ink);
+        color: #fff;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+        transition: transform 0.15s, box-shadow 0.2s;
       }
 
-      .sub {
+      .hero-scroll-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 36px rgba(0, 0, 0, 0.22);
+      }
+
+      .hero-scroll-link:active {
+        transform: translateY(0);
+      }
+
+      .search-panel {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.92) 12%, #fff 100%);
+        border-radius: 32px 32px 0 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 0 -20px 60px rgba(15, 23, 42, 0.06);
+        padding: 48px 0 72px;
+        margin-top: -8px;
+      }
+
+      .wrap {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0 22px;
+      }
+
+      .panel-title {
+        font-family: Outfit, system-ui, sans-serif;
+        font-weight: 800;
+        font-size: clamp(1.35rem, 3vw, 1.75rem);
+        letter-spacing: -0.02em;
+        margin: 0 0 8px;
+        color: var(--ink);
+      }
+
+      .panel-lead {
         color: var(--muted);
         font-size: 0.95rem;
-        margin-bottom: 28px;
-        line-height: 1.55;
-      }
-
-      .sub code {
-        font-family: ui-monospace, Consolas, monospace;
-        font-size: 0.82em;
-        color: #0f172a;
-        background: #e2e8f0;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-weight: 500;
+        line-height: 1.6;
+        margin: 0 0 28px;
+        max-width: 40rem;
       }
 
       .card {
         background: var(--card);
         border: 1px solid var(--stroke);
         border-radius: var(--radius);
-        box-shadow: var(--shadow-card);
+        box-shadow: 0 4px 24px rgba(15, 23, 42, 0.05);
         padding: 26px 26px 22px;
         margin-bottom: 22px;
       }
 
       label {
         display: block;
-        font-size: 0.78rem;
+        font-size: 0.72rem;
         text-transform: uppercase;
-        letter-spacing: 0.07em;
+        letter-spacing: 0.08em;
         color: var(--muted);
         margin-bottom: 8px;
-        font-weight: 600;
+        font-weight: 700;
       }
 
-      input[type='text'],
-      input[type='password'] {
+      input[type='text'] {
         width: 100%;
-        padding: 13px 15px;
-        border-radius: 12px;
-        border: 1px solid var(--stroke-strong);
-        background: #ffffff;
-        color: var(--text);
+        padding: 14px 16px;
+        border-radius: 14px;
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        background: #fafafa;
+        color: var(--ink);
         font-size: 1rem;
         outline: none;
-        transition: border-color 0.2s, box-shadow 0.2s;
+        transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
       }
 
       input::placeholder {
-        color: #94a3b8;
+        color: #9ca3af;
       }
 
       input:focus {
-        border-color: var(--accent);
-        box-shadow: 0 0 0 3px var(--accent-soft);
+        border-color: var(--ink);
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
       }
 
-      .row {
-        display: grid;
-        gap: 16px;
+      .search-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        align-items: flex-end;
       }
 
-      @media (min-width: 560px) {
-        .row-2 {
-          grid-template-columns: 1fr 1fr;
-        }
+      .search-row .grow {
+        flex: 1;
+        min-width: min(100%, 240px);
+      }
+
+      .search-row .actions {
+        margin-top: 0;
       }
 
       .actions {
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
-        margin-top: 20px;
         align-items: center;
       }
 
       button {
         font-family: Outfit, system-ui, sans-serif;
-        font-weight: 600;
+        font-weight: 700;
         border: none;
-        border-radius: 12px;
-        padding: 12px 22px;
+        border-radius: 999px;
+        padding: 13px 26px;
         cursor: pointer;
         font-size: 0.95rem;
         transition: transform 0.15s, opacity 0.15s, box-shadow 0.2s;
-        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
       }
 
       button:active {
@@ -166,66 +415,40 @@
       button:disabled {
         opacity: 0.55;
         cursor: not-allowed;
-        box-shadow: none;
       }
 
       .btn-primary {
-        background: linear-gradient(135deg, #2563eb, #4f46e5);
-        color: #ffffff;
+        background: var(--ink);
+        color: #fff;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
       }
 
       .btn-primary:hover:not(:disabled) {
-        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
       }
 
       .btn-ghost {
-        background: #ffffff;
-        color: var(--text);
-        border: 1px solid var(--stroke-strong);
-        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+        background: #fff;
+        color: var(--ink);
+        border: 1px solid rgba(15, 23, 42, 0.12);
       }
 
       .btn-ghost:hover:not(:disabled) {
-        background: #f8fafc;
+        background: #f4f4f5;
       }
 
       .btn-export {
-        background: linear-gradient(135deg, #059669, #0d9488);
-        color: #ffffff;
+        background: linear-gradient(135deg, #047857, #0d9488);
+        color: #fff;
       }
 
       .btn-export:hover:not(:disabled) {
-        box-shadow: 0 4px 14px rgba(5, 150, 105, 0.3);
+        box-shadow: 0 4px 14px rgba(4, 120, 87, 0.35);
       }
 
-      .toolbar {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        align-items: flex-end;
-        margin-bottom: 8px;
-      }
-
-      .grow {
-        flex: 1;
-        min-width: 200px;
-      }
-
-      .badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 7px 14px;
-        border-radius: 999px;
-        font-size: 0.8rem;
-        color: var(--muted);
-        border: 1px solid var(--stroke);
-        background: linear-gradient(180deg, #f8fafc, #f1f5f9);
-      }
-
-      .badge strong {
-        color: var(--accent);
-        font-weight: 700;
+      .btn-sm {
+        padding: 8px 16px;
+        font-size: 0.85rem;
       }
 
       .msg {
@@ -242,51 +465,21 @@
         color: var(--ok);
       }
 
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.9rem;
-      }
-
-      th,
-      td {
-        text-align: left;
-        padding: 12px 10px;
-        border-bottom: 1px solid var(--stroke);
-        vertical-align: top;
-      }
-
-      th {
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 14px;
+        border-radius: 999px;
+        font-size: 0.8rem;
         color: var(--muted);
-        font-weight: 600;
-        font-size: 0.72rem;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        background: linear-gradient(180deg, #f8fafc, #ffffff);
+        border: 1px solid var(--stroke);
+        background: #fafafa;
       }
 
-      tbody tr:hover {
-        background: #f8fafc;
-      }
-
-      a {
-        color: var(--accent);
-        text-decoration: none;
-        word-break: break-word;
-        font-weight: 500;
-      }
-
-      a:hover {
-        text-decoration: underline;
-      }
-
-      .btn-sm {
-        padding: 8px 14px;
-        font-size: 0.85rem;
-      }
-
-      .results-head {
-        margin-bottom: 14px;
+      .badge strong {
+        color: var(--ink);
+        font-weight: 800;
       }
 
       .badges-row {
@@ -303,17 +496,9 @@
         justify-content: flex-start;
         gap: 14px;
         padding: 12px 14px;
-        background: #f8fafc;
+        background: #fafafa;
         border: 1px solid var(--stroke);
-        border-radius: 12px;
-      }
-
-      .pager-below {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: 16px;
-        padding-top: 4px;
+        border-radius: 14px;
       }
 
       .list-toolbar-left {
@@ -328,7 +513,7 @@
         align-items: center;
         gap: 8px;
         font-size: 0.88rem;
-        color: var(--text);
+        color: var(--ink);
         cursor: pointer;
         user-select: none;
       }
@@ -336,7 +521,13 @@
       .filter-label input {
         width: 16px;
         height: 16px;
-        accent-color: var(--accent);
+        accent-color: var(--ink);
+      }
+
+      .pager-below {
+        display: flex;
+        justify-content: center;
+        margin-top: 16px;
       }
 
       .pager {
@@ -348,7 +539,7 @@
       .page-meta {
         font-size: 0.88rem;
         color: var(--muted);
-        min-width: 7.5rem;
+        min-width: 8rem;
         text-align: center;
       }
 
@@ -362,7 +553,7 @@
         width: 100%;
         overflow-x: auto;
         border: 1px solid var(--stroke);
-        border-radius: 12px;
+        border-radius: 14px;
         background: #fff;
       }
 
@@ -376,7 +567,33 @@
 
       table.result-table th,
       table.result-table td {
+        text-align: left;
+        padding: 12px 10px;
+        border-bottom: 1px solid var(--stroke);
         vertical-align: middle;
+      }
+
+      table.result-table th {
+        color: var(--muted);
+        font-weight: 700;
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        background: #fafafa;
+      }
+
+      tbody tr:hover {
+        background: #fafafa;
+      }
+
+      a {
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      a:hover {
+        text-decoration: underline;
       }
 
       .cell-clip {
@@ -401,8 +618,8 @@
       .spinner {
         width: 18px;
         height: 18px;
-        border: 2px solid #e2e8f0;
-        border-top-color: var(--accent);
+        border: 2px solid #e5e7eb;
+        border-top-color: var(--ink);
         border-radius: 50%;
         animation: spin 0.7s linear infinite;
         display: inline-block;
@@ -416,251 +633,68 @@
         }
       }
 
-      .topbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 16px;
-        margin-bottom: 20px;
-      }
-
-      .brand {
-        font-family: Outfit, sans-serif;
-        font-weight: 700;
-        font-size: 1.05rem;
-        color: #334155;
-        letter-spacing: -0.02em;
-      }
-
-      .page {
-        min-height: 100vh;
-      }
-
-      .login-head {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
-      }
-
-      .page-login {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 32px 20px 48px;
-        position: relative;
-        overflow: hidden;
-        background: radial-gradient(900px 520px at 15% 20%, rgba(99, 102, 241, 0.18), transparent 55%),
-          radial-gradient(700px 420px at 88% 15%, rgba(14, 165, 233, 0.16), transparent 50%),
-          radial-gradient(600px 400px at 50% 100%, rgba(244, 114, 182, 0.08), transparent 45%),
-          linear-gradient(165deg, #f0f4ff 0%, #f8fafc 38%, #eef2ff 100%);
-      }
-
-      .page-login .wrap {
-        max-width: 460px;
-        width: 100%;
-        padding: 0;
-        margin: 0;
-      }
-
-      .login-decor {
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        overflow: hidden;
-      }
-
-      .login-decor::before,
-      .login-decor::after {
-        content: '';
-        position: absolute;
-        border-radius: 50%;
-        filter: blur(80px);
-        opacity: 0.55;
-      }
-
-      .login-decor::before {
-        width: 320px;
-        height: 320px;
-        background: rgba(129, 140, 248, 0.35);
-        top: -120px;
-        right: -80px;
-      }
-
-      .login-decor::after {
-        width: 280px;
-        height: 280px;
-        background: rgba(56, 189, 248, 0.28);
-        bottom: -100px;
-        left: -60px;
-      }
-
-      .login-hero {
-        text-align: center;
-        margin-bottom: 28px;
-      }
-
-      .login-mark {
-        width: 52px;
-        height: 52px;
-        margin: 0 auto 16px;
-        border-radius: 14px;
-        background: linear-gradient(135deg, #4f46e5, #2563eb);
-        color: #fff;
-        font-size: 1.35rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 12px 32px rgba(37, 99, 235, 0.35);
-      }
-
-      .login-brand {
-        font-size: 1.35rem;
-        letter-spacing: -0.03em;
-        background: linear-gradient(115deg, #0f172a, #3730a3 50%, #2563eb);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-      }
-
-      .login-tagline {
-        margin: 10px 0 0;
-        font-size: 0.92rem;
-        color: var(--muted);
-        line-height: 1.5;
-      }
-
-      .login-card {
-        max-width: 100%;
-        border-radius: 20px;
-        padding: 28px 28px 24px;
-        border: 1px solid rgba(148, 163, 184, 0.25);
-        box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 24px 48px -12px rgba(30, 58, 138, 0.12);
-        background: rgba(255, 255, 255, 0.92);
-        backdrop-filter: blur(12px);
-      }
-
-      .login-welcome {
-        margin: 0 0 6px;
-        font-family: Outfit, sans-serif;
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: var(--text);
-        letter-spacing: -0.02em;
-      }
-
-      .login-demo {
-        margin: 0 0 22px;
-        font-size: 0.88rem;
-        color: var(--muted);
-      }
-
-      .login-demo code {
-        font-family: ui-monospace, Consolas, monospace;
-        font-size: 0.85em;
-        color: #1e40af;
-        background: #e0e7ff;
-        padding: 3px 8px;
-        border-radius: 6px;
-        font-weight: 600;
-      }
-
-      .btn-login-wide {
-        width: 100%;
-        margin-top: 4px;
-        padding: 14px 22px;
-        font-size: 1rem;
-      }
-
-      .login-foot {
-        margin-top: 20px;
-        padding-top: 18px;
-        border-top: 1px solid var(--stroke);
-      }
-
-      .hint {
-        margin-top: 20px;
-        padding: 14px 16px;
-        border-radius: 12px;
-        background: #f1f5f9;
-        border: 1px solid var(--stroke);
-        color: var(--muted);
-        font-size: 0.85rem;
-        line-height: 1.6;
-      }
-
-      .hint code {
-        font-family: ui-monospace, Consolas, monospace;
-        font-size: 0.8rem;
-        color: #0f172a;
-        background: #e2e8f0;
-        padding: 2px 6px;
-        border-radius: 4px;
+      .results-head {
+        margin-bottom: 14px;
       }
     </style>
   </head>
   <body>
-    <div class="noise" aria-hidden="true"></div>
-
-    <!-- 登录页（与搜索页二选一显示） -->
-    <div id="pageLogin" class="page page-login">
-      <div class="login-decor" aria-hidden="true"></div>
-      <div class="wrap">
-        <div class="login-hero">
-          <div class="login-mark" aria-hidden="true">▶</div>
-          <div class="brand login-brand">Twotrees | Influencer Scout</div>
-          <p class="login-tagline">YouTube 关键词视频检索 · 达人信息与导出</p>
+    <header class="nav-shell">
+      <nav class="nav-pill" aria-label="Main navigation">
+        <div class="nav-left">
+          <a class="nav-logo-link" href="#hero" title="Two Trees">
+            <span class="nav-logo-wrap">
+              <img
+                class="nav-logo"
+                src="https://twotrees3d.com/cdn/shop/files/logo_1c806b7f-262b-463d-826b-790ffb4882b4.png?v=1751007669&amp;width=500"
+                width="200"
+                height="54"
+                alt="Two Trees"
+                decoding="async"
+                fetchpriority="high"
+              />
+            </span>
+          </a>
         </div>
-        <section>
-          <div class="card login-card">
-            <p class="login-welcome">欢迎回来</p>
-            <p class="login-demo">演示环境：账号与密码均为 <code>123</code></p>
-            <div class="row">
-              <div>
-                <label>账号</label>
-                <input type="text" id="loginUser" autocomplete="username" value="123" />
-              </div>
-              <div>
-                <label>密码</label>
-                <input type="password" id="loginPass" autocomplete="current-password" value="123" />
-              </div>
-            </div>
-            <div class="actions" style="margin-top: 8px">
-              <button type="button" class="btn-primary btn-login-wide" id="btnLogin">进入工作台</button>
-            </div>
-            <div class="msg" id="loginMsg"></div>
-            <!-- <div class="hint login-foot">
-              <strong style="color: var(--text)">访问 Google 需代理？</strong><br />
-              在 <code>config.json</code> 填写 <code>httpsProxy</code>（如 v2ray 常见
-              <code>http://127.0.0.1:10808</code>），端口以本机软件为准。
-            </div> -->
+        <div class="nav-center">
+          <a class="nav-home" href="#hero" data-i18n="navHome">Home</a>
+        </div>
+        <div class="nav-right">
+          <div class="lang-toggle" role="group" aria-label="Language">
+            <button type="button" class="lang-btn active" data-set-lang="en" id="langEn">EN</button>
+            <button type="button" class="lang-btn" data-set-lang="zh" id="langZh">中文</button>
           </div>
-        </section>
-      </div>
-    </div>
-
-    <!-- 搜索页（仅登录且路由为 #/app 时显示） -->
-    <div id="pageApp" class="page hidden">
-      <div class="wrap">
-        <div class="topbar">
-          <div class="brand">Twotrees | Influencer Scout</div>
-          <button type="button" class="btn-ghost" id="btnLogout">退出登录</button>
         </div>
+      </nav>
+    </header>
 
-        <section>
-          <h1>YouTube 关键词视频</h1>
-          <p class="sub">
-            使用 YouTube「视频」搜索（<code>type=video</code>）：关键词会匹配<strong>视频标题与说明</strong>等，与频道名无关。结果按视频逐条列出<strong>视频链接</strong>及对应<strong>博主/频道</strong>信息；邮箱来自频道简介（正则 + Gemini）。支持导出 Excel。
-          </p>
+    <main>
+      <section class="hero" id="hero">
+        <div class="hero-deco" aria-hidden="true">
+          <span class="hero-pill hero-pill--a">Creator</span>
+          <span class="hero-pill hero-pill--b">Scout</span>
+          <span class="hero-pill hero-pill--c">Growth</span>
+        </div>
+        <h1 class="hero-title" data-i18n="heroTitle"></h1>
+        <p class="hero-sub" data-i18n="heroSub"></p>
+        <div class="hero-scroll">
+          <a class="hero-scroll-link" href="#search" data-i18n="scrollToSearch">Scroll to search</a>
+        </div>
+      </section>
+
+      <section class="search-panel" id="search">
+        <div class="wrap">
+          <h2 class="panel-title" data-i18n="panelTitle">Search</h2>
+          <!-- <p class="panel-lead" data-i18n="panelLead"></p> -->
 
           <div class="card">
-            <div class="toolbar">
+            <div class="search-row">
               <div class="grow">
-                <label>搜索关键词</label>
-                <input type="text" id="keyword" placeholder="例如：美妆测评、游戏解说…" />
+                <label for="keyword" data-i18n="labelKeyword">Keyword</label>
+                <input type="text" id="keyword" autocomplete="off" data-i18n-placeholder="phKeyword" />
               </div>
-              <div class="actions" style="margin-top: 24px">
-                <button type="button" class="btn-primary" id="btnSearch">搜索</button>
+              <div class="actions">
+                <button type="button" class="btn-primary" id="btnSearch" data-i18n="btnSearch">Search</button>
               </div>
             </div>
             <div class="msg" id="searchMsg"></div>
@@ -669,20 +703,28 @@
           <div class="card hidden" id="resultsCard">
             <div class="results-head">
               <div class="badges-row">
-                <span class="badge">关键词 <strong id="kwDisplay"></strong></span>
-                <span class="badge">共 <strong id="countDisplay">0</strong> 条视频</span>
-                <span class="badge hidden" id="badgeFiltered"><strong id="filteredCount">0</strong> 条含邮箱（当前列表）</span>
+                <span class="badge"><span data-i18n="badgeKw">Keyword</span> <strong id="kwDisplay"></strong></span>
+                <span class="badge"
+                  ><span data-i18n="badgeTotal">Total</span> <strong id="countDisplay">0</strong>
+                  <span data-i18n="badgeVideos">videos</span></span
+                >
+                <span class="badge hidden" id="badgeFiltered"
+                  ><strong id="filteredCount">0</strong> <span data-i18n="badgeFiltered">with email (list)</span></span
+                >
               </div>
               <div class="list-toolbar">
                 <div class="list-toolbar-left">
                   <label class="filter-label"
-                    ><input type="checkbox" id="filterEmail" /> 仅显示有邮箱的</label
+                    ><input type="checkbox" id="filterEmail" /> <span data-i18n="filterEmail">Email only</span></label
                   >
                   <label class="filter-label"
-                    ><input type="checkbox" id="exportEmailOnly" /> 导出 Excel 时仅包含有邮箱的</label
+                    ><input type="checkbox" id="exportEmailOnly" />
+                    <span data-i18n="exportEmailOnly">Export rows with email only</span></label
                   >
                   <span class="list-muted" id="emailSummary"></span>
-                  <button type="button" class="btn-export btn-sm" id="btnExport">导出 Excel</button>
+                  <button type="button" class="btn-export btn-sm" id="btnExport" data-i18n="btnExport">
+                    Export Excel
+                  </button>
                 </div>
               </div>
             </div>
@@ -698,12 +740,12 @@
                 </colgroup>
                 <thead>
                   <tr>
-                    <th>视频标题</th>
-                    <th>视频链接</th>
-                    <th>博主（频道）</th>
-                    <th>频道主页</th>
-                    <th>公开邮箱</th>
-                    <th>粉丝数</th>
+                    <th data-i18n="colVideo">Video title</th>
+                    <th data-i18n="colVideoUrl">Video URL</th>
+                    <th data-i18n="colChannel">Channel</th>
+                    <th data-i18n="colChannelUrl">Channel page</th>
+                    <th data-i18n="colEmail">Public email</th>
+                    <th data-i18n="colSubs">Subscribers</th>
                   </tr>
                 </thead>
                 <tbody id="tbody"></tbody>
@@ -711,24 +753,132 @@
             </div>
             <div class="pager-below">
               <div class="pager">
-                <button type="button" class="btn-ghost btn-sm" id="btnPrevPage">上一页</button>
-                <span class="page-meta" id="pageMeta">第 1 / 1 页</span>
-                <button type="button" class="btn-ghost btn-sm" id="btnNextPage">下一页</button>
+                <button type="button" class="btn-ghost btn-sm" id="btnPrevPage" data-i18n="btnPrev">Previous</button>
+                <span class="page-meta" id="pageMeta">Page 1 / 1</span>
+                <button type="button" class="btn-ghost btn-sm" id="btnNextPage" data-i18n="btnNext">Next</button>
               </div>
             </div>
           </div>
-        </section>
-      </div>
-    </div>
+        </div>
+      </section>
+    </main>
 
     <script>
-      const STORAGE_KEY = 'influencer_token';
-      const HASH_LOGIN = '#/login';
-      const HASH_APP = '#/app';
+      const LANG_KEY = 'influencer_lang';
 
-      const pageLogin = document.getElementById('pageLogin');
-      const pageApp = document.getElementById('pageApp');
-      const loginMsg = document.getElementById('loginMsg');
+      const STR = {
+        en: {
+          navHome: 'Home',
+          heroTitle: 'Find creators\nfrom YouTube\nvideo search',
+          heroSub:
+            'Keyword-matched videos, channel profiles, public emails from descriptions, and one-click Excel export — built for teams who source influencers fast.',
+          scrollToSearch: 'Scroll to search',
+          panelTitle: 'Search',
+          panelLead:
+            'Uses YouTube type=video: keywords match titles and descriptions, not channel names. Each row is a video with channel info; emails come from channel bios (regex, optional Gemini).',
+          labelKeyword: 'Keyword',
+          phKeyword: 'e.g. beauty review, indie game, workout…',
+          btnSearch: 'Search',
+          badgeKw: 'Keyword',
+          badgeTotal: 'Total',
+          badgeVideos: 'videos',
+          badgeFiltered: 'with email (list)',
+          filterEmail: 'Show rows with email only',
+          exportEmailOnly: 'Export rows with email only',
+          btnExport: 'Export Excel',
+          colVideo: 'Video title',
+          colVideoUrl: 'Video URL',
+          colChannel: 'Channel',
+          colChannelUrl: 'Channel page',
+          colEmail: 'Public email',
+          colSubs: 'Subscribers',
+          btnPrev: 'Previous',
+          btnNext: 'Next',
+          errNeedKeyword: 'Enter a keyword',
+          searching: 'Searching videos (large result sets may take a while)…',
+          done: 'Done',
+          errSearch: 'Search failed',
+          errNoExportEmail: 'No rows with email to export',
+          errNoExport: 'Nothing to export',
+          downloaded: 'Download started',
+          errExport: 'Export failed',
+          dash: '—',
+          pageEmpty: 'Page 1 / 1 · {n} per page',
+          pageOf: 'Page {cur} / {tot} · {n} per page',
+          emailSummary: '({ne} of {all} with email)',
+        },
+        zh: {
+          navHome: '首页',
+          heroTitle: '用 YouTube\n视频搜索\n发现达人',
+          heroSub:
+            '按关键词匹配视频与频道、从简介提取公开邮箱，并支持一键导出 Excel，适合需要快速建联与筛选达人的团队。',
+          scrollToSearch: '向下滚动开始搜索',
+          panelTitle: '搜索',
+          panelLead:
+            '使用 YouTube 的 type=video：关键词匹配标题与说明，而非频道名。每行一条视频及频道信息；邮箱来自频道简介（正则，可选 Gemini）。',
+          labelKeyword: '搜索关键词',
+          phKeyword: '例如：美妆测评、独立游戏、健身教程…',
+          btnSearch: '搜索',
+          badgeKw: '关键词',
+          badgeTotal: '共',
+          badgeVideos: '条视频',
+          badgeFiltered: '条含邮箱（当前列表）',
+          filterEmail: '仅显示有邮箱的',
+          exportEmailOnly: '导出时仅包含有邮箱的',
+          btnExport: '导出 Excel',
+          colVideo: '视频标题',
+          colVideoUrl: '视频链接',
+          colChannel: '频道',
+          colChannelUrl: '频道主页',
+          colEmail: '公开邮箱',
+          colSubs: '粉丝数',
+          btnPrev: '上一页',
+          btnNext: '下一页',
+          errNeedKeyword: '请输入关键词',
+          searching: '正在搜索视频（结果较多时可能需要较长时间）…',
+          done: '检索完成',
+          errSearch: '搜索失败',
+          errNoExportEmail: '没有含邮箱的记录可导出',
+          errNoExport: '没有可导出的数据',
+          downloaded: '已开始下载',
+          errExport: '导出失败',
+          dash: '—',
+          pageEmpty: '第 1 / 1 页 · 每页 {n} 条',
+          pageOf: '第 {cur} / {tot} 页 · 每页 {n} 条',
+          emailSummary: '（全部 {all} 条里 {ne} 条有邮箱）',
+        },
+      };
+
+      let lang = localStorage.getItem(LANG_KEY) || 'en';
+      if (lang !== 'en' && lang !== 'zh') lang = 'en';
+
+      function T(key, vars) {
+        let s = STR[lang][key] || STR.en[key] || key;
+        if (vars) {
+          Object.keys(vars).forEach((k) => {
+            s = s.replace(new RegExp('\\{' + k + '\\}', 'g'), String(vars[k]));
+          });
+        }
+        return s;
+      }
+
+      function applyLang() {
+        document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+        document.querySelectorAll('[data-i18n]').forEach((el) => {
+          const k = el.getAttribute('data-i18n');
+          if (k && STR[lang][k] != null) el.textContent = STR[lang][k];
+        });
+        document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+          const k = el.getAttribute('data-i18n-placeholder');
+          if (k && STR[lang][k] != null) el.setAttribute('placeholder', STR[lang][k]);
+        });
+        document.getElementById('langEn').classList.toggle('active', lang === 'en');
+        document.getElementById('langZh').classList.toggle('active', lang === 'zh');
+        localStorage.setItem(LANG_KEY, lang);
+        document.title =
+          lang === 'zh' ? '达人检索 — YouTube 搜索' : 'Influencer Scout — YouTube search';
+      }
+
       const searchMsg = document.getElementById('searchMsg');
       const tbody = document.getElementById('tbody');
       const resultsCard = document.getElementById('resultsCard');
@@ -738,19 +888,19 @@
       let lastVideos = [];
       let currentPage = 1;
 
-      function getToken() {
-        return sessionStorage.getItem(STORAGE_KEY) || '';
-      }
-
-      function setToken(t) {
-        if (t) sessionStorage.setItem(STORAGE_KEY, t);
-        else sessionStorage.removeItem(STORAGE_KEY);
-      }
+      document.getElementById('langEn').onclick = () => {
+        lang = 'en';
+        applyLang();
+        if (lastVideos.length) renderVideoRows();
+      };
+      document.getElementById('langZh').onclick = () => {
+        lang = 'zh';
+        applyLang();
+        if (lastVideos.length) renderVideoRows();
+      };
 
       async function api(path, opts = {}) {
         const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
-        const t = getToken();
-        if (t) headers.Authorization = 'Bearer ' + t;
         const res = await fetch(path, { ...opts, headers });
         const ct = res.headers.get('content-type') || '';
         if (ct.includes('application/json')) {
@@ -783,7 +933,7 @@
         const es = document.getElementById('emailSummary');
         if (es) es.textContent = '';
         const pm = document.getElementById('pageMeta');
-        if (pm) pm.textContent = '第 1 / 1 页';
+        if (pm) pm.textContent = T('pageEmpty', { n: PAGE_SIZE });
       }
 
       function getFilteredVideos() {
@@ -810,7 +960,9 @@
         const emailSummary = document.getElementById('emailSummary');
         if (emailSummary) {
           const ne = countWithEmail(lastVideos);
-          emailSummary.textContent = totalAll ? `（全部结果里 ${ne} 条有邮箱）` : '';
+          emailSummary.textContent = totalAll
+            ? T('emailSummary', { ne, all: totalAll })
+            : '';
         }
 
         const filterOn = document.getElementById('filterEmail').checked;
@@ -821,8 +973,11 @@
           badgeFiltered.classList.toggle('hidden', !filterOn);
         }
 
-        document.getElementById('pageMeta').textContent =
-          total === 0 ? '第 1 / 1 页 · 每页 ' + PAGE_SIZE + ' 条' : '第 ' + currentPage + ' / ' + totalPages + ' 页 · 每页 ' + PAGE_SIZE + ' 条';
+        const pm = document.getElementById('pageMeta');
+        pm.textContent =
+          total === 0
+            ? T('pageEmpty', { n: PAGE_SIZE })
+            : T('pageOf', { cur: currentPage, tot: totalPages, n: PAGE_SIZE });
 
         const prev = document.getElementById('btnPrevPage');
         const next = document.getElementById('btnNextPage');
@@ -830,6 +985,7 @@
         if (next) next.disabled = currentPage >= totalPages || total === 0;
 
         tbody.innerHTML = '';
+        const dash = T('dash');
         for (const r of slice) {
           const tr = document.createElement('tr');
           const title = r.videoTitle || '';
@@ -865,7 +1021,7 @@
             '</a></td><td class="cell-clip" title="' +
             escapeAttr(em) +
             '">' +
-            (em ? escapeHtml(em) : '<span style="color:var(--muted)">—</span>') +
+            (em ? escapeHtml(em) : '<span style="color:#64748b">' + dash + '</span>') +
             '</td><td class="cell-clip">' +
             fmtSubs(r.subscribers) +
             '</td>';
@@ -875,88 +1031,34 @@
         btnExport.disabled = totalAll === 0;
       }
 
-      function showLoginPage() {
-        resetSearchUi();
-        loginMsg.textContent = '';
-        loginMsg.className = 'msg';
-        pageLogin.classList.remove('hidden');
-        pageApp.classList.add('hidden');
+      (function normalizePath() {
         const path = location.pathname.replace(/\/$/, '') || '/';
-        if (path !== '/login' || location.hash) {
-          history.replaceState(null, '', '/login');
+        if (path === '/login' || path === '/app') {
+          history.replaceState(null, '', '/');
         }
-      }
+      })();
 
-      function showAppPage() {
-        if (!getToken()) {
-          showLoginPage();
-          return;
-        }
-        pageLogin.classList.add('hidden');
-        pageApp.classList.remove('hidden');
-        const path = location.pathname.replace(/\/$/, '') || '/';
-        const target = '/app' + HASH_APP;
-        if (path !== '/app' || location.hash !== HASH_APP) {
-          history.replaceState(null, '', target);
-        }
-      }
+      applyLang();
 
-      /** 路径 /app 需登录；未登录打开 /app 会整页跳到 /login */
-      function syncRoute() {
-        const token = getToken();
-        const path = location.pathname.replace(/\/$/, '') || '/';
-
-        if (path === '/app' && !token) {
-          window.location.replace('/login');
-          return;
-        }
-
-        if (token) {
-          showAppPage();
-          return;
-        }
-
-        showLoginPage();
-      }
-
-      document.getElementById('btnLogout').onclick = async () => {
-        try {
-          await api('/api/logout', { method: 'POST', body: JSON.stringify({}) });
-        } catch (_) {}
-        setToken('');
-        showLoginPage();
-      };
-
-      document.getElementById('btnLogin').onclick = async () => {
-        loginMsg.textContent = '';
-        loginMsg.className = 'msg';
-        const username = document.getElementById('loginUser').value.trim();
-        const password = document.getElementById('loginPass').value;
-        try {
-          const data = await api('/api/login', {
-            method: 'POST',
-            body: JSON.stringify({ username, password }),
-          });
-          setToken(data.token);
-          resetSearchUi();
-          showAppPage();
-        } catch (e) {
-          loginMsg.textContent = e.message || '登录失败';
-          loginMsg.className = 'msg err';
-        }
-      };
-
-      window.addEventListener('hashchange', syncRoute);
-      window.addEventListener('popstate', syncRoute);
-      syncRoute();
+      document.getElementById('keyword').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') document.getElementById('btnSearch').click();
+      });
 
       function fmtSubs(n) {
-        if (n === '' || n == null) return '—';
+        const dash = T('dash');
+        if (n === '' || n == null) return dash;
         const x = Number(n);
-        if (Number.isNaN(x)) return '—';
-        if (x >= 1e8) return (x / 1e8).toFixed(2) + ' 亿';
-        if (x >= 1e4) return (x / 1e4).toFixed(1) + ' 万';
-        return x.toLocaleString('zh-CN');
+        if (Number.isNaN(x)) return dash;
+        const loc = lang === 'zh' ? 'zh-CN' : 'en-US';
+        if (lang === 'zh') {
+          if (x >= 1e8) return (x / 1e8).toFixed(2) + ' 亿';
+          if (x >= 1e4) return (x / 1e4).toFixed(1) + ' 万';
+        } else {
+          if (x >= 1e9) return (x / 1e9).toFixed(2) + 'B';
+          if (x >= 1e6) return (x / 1e6).toFixed(2) + 'M';
+          if (x >= 1e3) return (x / 1e3).toFixed(1) + 'K';
+        }
+        return x.toLocaleString(loc);
       }
 
       document.getElementById('btnSearch').onclick = async () => {
@@ -968,14 +1070,14 @@
         currentPage = 1;
 
         if (!q) {
-          searchMsg.textContent = '请输入关键词';
+          searchMsg.textContent = T('errNeedKeyword');
           searchMsg.className = 'msg err';
           return;
         }
 
         const btn = document.getElementById('btnSearch');
         btn.disabled = true;
-        searchMsg.innerHTML = '<span class="spinner"></span>正在按关键词搜索视频（分页较多时可能需几十秒）…';
+        searchMsg.innerHTML = '<span class="spinner"></span>' + T('searching');
         searchMsg.className = 'msg ok';
 
         try {
@@ -987,10 +1089,10 @@
           document.getElementById('exportEmailOnly').checked = false;
           renderVideoRows();
           resultsCard.classList.remove('hidden');
-          searchMsg.textContent = data.message || '检索完成';
+          searchMsg.textContent = data.message || T('done');
           searchMsg.className = 'msg ok';
         } catch (e) {
-          searchMsg.textContent = e.message || '搜索失败';
+          searchMsg.textContent = e.message || T('errSearch');
           searchMsg.className = 'msg err';
         } finally {
           btn.disabled = false;
@@ -1038,7 +1140,7 @@
           payload = lastVideos.filter((r) => r.email && String(r.email).trim());
         }
         if (!payload.length) {
-          searchMsg.textContent = exportOnly ? '没有含邮箱的记录可导出' : '没有可导出的数据';
+          searchMsg.textContent = exportOnly ? T('errNoExportEmail') : T('errNoExport');
           searchMsg.className = 'msg err';
           return;
         }
@@ -1047,10 +1149,7 @@
         try {
           const res = await fetch('/api/export', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: 'Bearer ' + getToken(),
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ videos: payload }),
           });
           if (!res.ok) {
@@ -1063,10 +1162,10 @@
           a.download = 'youtube-videos.xlsx';
           a.click();
           URL.revokeObjectURL(a.href);
-          searchMsg.textContent = '已下载 Excel';
+          searchMsg.textContent = T('downloaded');
           searchMsg.className = 'msg ok';
         } catch (e) {
-          searchMsg.textContent = e.message || '导出失败';
+          searchMsg.textContent = e.message || T('errExport');
           searchMsg.className = 'msg err';
         }
       };

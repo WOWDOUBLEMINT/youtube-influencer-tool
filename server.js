@@ -1,7 +1,8 @@
+require('dotenv').config();
+
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const crypto = require('crypto');
 const axios = require('axios');
 const { HttpsProxyAgent } = require('https-proxy-agent');
 const XLSX = require('xlsx');
@@ -35,6 +36,40 @@ const GEMINI_API_KEY =
 /** 访问 Google API 超时（毫秒）；网络差或走代理时可适当加大 */
 const GOOGLE_API_TIMEOUT_MS = Number(process.env.GOOGLE_API_TIMEOUT_MS || 60000);
 
+/**
+ * search.list 每次分页约消耗 100 点每日配额；原先默认 40 页极易打满免费额度。
+ * 可通过环境变量调大，例如 YOUTUBE_SEARCH_MAX_PAGES=15
+ */
+const YOUTUBE_SEARCH_MAX_PAGES = (() => {
+  const n = Number(process.env.YOUTUBE_SEARCH_MAX_PAGES ?? 6);
+  if (!Number.isFinite(n)) return 6;
+  return Math.min(50, Math.max(1, Math.floor(n)));
+})();
+
+/** 同一 IP 两次搜索完成之间的最短间隔（毫秒），0 表示不限制；可减轻连点把日配额打光 */
+const YOUTUBE_SEARCH_MIN_INTERVAL_MS = Math.max(
+  0,
+  Number(process.env.YOUTUBE_SEARCH_MIN_INTERVAL_MS || 0)
+);
+
+/** 每次 search.list 翻页后延迟再请求下一页（毫秒），0 表示不延迟；略拉长总耗时、降低突发 QPS */
+const YOUTUBE_SEARCH_PAGE_DELAY_MS = Math.max(
+  0,
+  Number(process.env.YOUTUBE_SEARCH_PAGE_DELAY_MS || 0)
+);
+
+/** YouTube 项目默认每日配额（点），用于估算；以 Google Cloud 控制台为准 */
+const YOUTUBE_QUOTA_UNITS_PER_DAY = Number(process.env.YOUTUBE_QUOTA_UNITS_PER_DAY || 10000);
+
+const searchingByIp = new Set();
+const lastSearchCompleteByIp = new Map();
+
+function clientIp(req) {
+  const xf = req.headers['x-forwarded-for'];
+  if (typeof xf === 'string' && xf.trim()) return xf.split(',')[0].trim();
+  return req.socket?.remoteAddress || 'unknown';
+}
+
 const httpsProxyUrl = String(
   process.env.HTTPS_PROXY ||
     process.env.HTTP_PROXY ||
@@ -59,29 +94,50 @@ if (httpsProxyUrl) {
 const app = express();
 app.use(express.json({ limit: '2mb' }));
 
-const tokens = new Set();
-
-function authMiddleware(req, res, next) {
-  const raw = req.headers.authorization || '';
-  const token = raw.startsWith('Bearer ') ? raw.slice(7) : '';
-  if (!token || !tokens.has(token)) {
-    return res.status(401).json({ error: '请先登录' });
-  }
-  next();
+function stripHtml(s) {
+  return String(s || '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function formatYoutubeApiError(err) {
   const status = err.response?.status;
   const data = err.response?.data;
   const gErr = data?.error;
-  if (typeof gErr === 'string') return gErr;
-  if (gErr?.message) return gErr.message;
   const first = gErr?.errors?.[0];
-  if (first?.message) return `${first.message}${first.reason ? ` (${first.reason})` : ''}`;
-  if (typeof data === 'string' && data.trim()) return data.slice(0, 500);
-  if (err.message && err.message !== 'Error') return err.message;
-  if (err.code) return `网络错误: ${err.code}`;
-  return 'YouTube 请求失败';
+  const reason = first?.reason || '';
+
+  if (reason === 'quotaExceeded' || reason === 'dailyLimitExceeded') {
+    return (
+      'YouTube Data API daily quota exceeded. search.list costs about 100 units per page; ' +
+      'wait until quota resets (Pacific midnight) or raise the limit in Google Cloud Console → ' +
+      'APIs & Services → YouTube Data API v3 → Quotas. You can also lower usage by setting a smaller ' +
+      'YOUTUBE_SEARCH_MAX_PAGES in your server env (default is ' +
+      YOUTUBE_SEARCH_MAX_PAGES +
+      ').'
+    );
+  }
+
+  let msg = '';
+  if (typeof gErr === 'string') msg = gErr;
+  else if (gErr?.message) msg = gErr.message;
+  else if (first?.message) msg = `${first.message}${first.reason ? ` (${first.reason})` : ''}`;
+  else if (typeof data === 'string' && data.trim()) msg = data.slice(0, 500);
+  else if (err.message && err.message !== 'Error') msg = err.message;
+  else if (err.code) msg = `Network error: ${err.code}`;
+  else msg = 'YouTube request failed';
+
+  msg = stripHtml(msg);
+  if (/quota/i.test(msg) && status === 403) {
+    return (
+      'YouTube Data API quota exceeded (403). ' +
+      'Reduce searches or increase quota in Google Cloud Console; see YOUTUBE_SEARCH_MAX_PAGES (default ' +
+      YOUTUBE_SEARCH_MAX_PAGES +
+      ').'
+    );
+  }
+  return msg;
 }
 
 const EMAIL_RE = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
@@ -123,7 +179,8 @@ async function youtubeSearchVideoList(keyword, apiKey) {
   const list = [];
   const seenVideoIds = new Set();
   let pageToken = '';
-  const maxPages = 40;
+  const maxPages = YOUTUBE_SEARCH_MAX_PAGES;
+  let searchPageCount = 0;
 
   for (let page = 0; page < maxPages; page++) {
     const params = {
@@ -139,6 +196,7 @@ async function youtubeSearchVideoList(keyword, apiKey) {
     const { data } = await httpClient.get('https://www.googleapis.com/youtube/v3/search', {
       params,
     });
+    searchPageCount += 1;
 
     for (const item of data.items || []) {
       const videoId = item?.id?.videoId;
@@ -155,9 +213,12 @@ async function youtubeSearchVideoList(keyword, apiKey) {
 
     pageToken = data.nextPageToken;
     if (!pageToken) break;
+    if (YOUTUBE_SEARCH_PAGE_DELAY_MS > 0 && page + 1 < maxPages) {
+      await new Promise((r) => setTimeout(r, YOUTUBE_SEARCH_PAGE_DELAY_MS));
+    }
   }
 
-  return list;
+  return { rows: list, searchPageCount };
 }
 
 async function youtubeChannelsBatch(ids, apiKey) {
@@ -189,24 +250,7 @@ function channelPageUrl(ch) {
   return `https://www.youtube.com/channel/${id}`;
 }
 
-app.post('/api/login', (req, res) => {
-  const { username, password } = req.body || {};
-  if (username === '123' && password === '123') {
-    const token = crypto.randomBytes(24).toString('hex');
-    tokens.add(token);
-    return res.json({ token });
-  }
-  res.status(400).json({ error: '账号或密码错误' });
-});
-
-app.post('/api/logout', authMiddleware, (req, res) => {
-  const raw = req.headers.authorization || '';
-  const token = raw.startsWith('Bearer ') ? raw.slice(7) : '';
-  tokens.delete(token);
-  res.json({ ok: true });
-});
-
-app.get('/api/search', authMiddleware, async (req, res) => {
+app.get('/api/search', async (req, res) => {
   const q = String(req.query.q || '').trim();
   if (!q) return res.status(400).json({ error: '请输入关键词' });
   if (!YOUTUBE_API_KEY) {
@@ -216,10 +260,43 @@ app.get('/api/search', authMiddleware, async (req, res) => {
     });
   }
 
+  const ip = clientIp(req);
+  if (searchingByIp.has(ip)) {
+    return res.status(429).json({
+      error:
+        'A search is already running for your connection. Please wait until it finishes before starting another.',
+      code: 'search_in_progress',
+    });
+  }
+  if (YOUTUBE_SEARCH_MIN_INTERVAL_MS > 0) {
+    const last = lastSearchCompleteByIp.get(ip) || 0;
+    const elapsed = Date.now() - last;
+    if (last > 0 && elapsed < YOUTUBE_SEARCH_MIN_INTERVAL_MS) {
+      const retryAfterSeconds = Math.ceil((YOUTUBE_SEARCH_MIN_INTERVAL_MS - elapsed) / 1000);
+      res.setHeader('Retry-After', String(retryAfterSeconds));
+      return res.status(429).json({
+        error: `Please wait ${retryAfterSeconds}s before searching again (spacing requests saves daily YouTube API quota).`,
+        code: 'rate_limited',
+        retryAfterSeconds,
+      });
+    }
+  }
+
+  searchingByIp.add(ip);
   try {
-    const videoRows = await youtubeSearchVideoList(q, YOUTUBE_API_KEY);
+    const { rows: videoRows, searchPageCount } = await youtubeSearchVideoList(q, YOUTUBE_API_KEY);
     if (!videoRows.length) {
-      return res.json({ keyword: q, videos: [], message: '未找到相关视频' });
+      return res.json({
+        keyword: q,
+        videos: [],
+        message: '未找到相关视频',
+        usage: {
+          searchPages: searchPageCount,
+          channelCalls: 0,
+          estimatedUnits: searchPageCount * 100,
+          quotaUnitsPerDay: YOUTUBE_QUOTA_UNITS_PER_DAY,
+        },
+      });
     }
 
     const uniqueChannelIds = [...new Set(videoRows.map((v) => v.channelId))];
@@ -278,7 +355,21 @@ app.get('/api/search', authMiddleware, async (req, res) => {
       });
     }
 
-    res.json({ keyword: q, videos });
+    const channelCalls = Math.ceil(uniqueChannelIds.length / 50);
+    const estimatedUnits = searchPageCount * 100 + channelCalls * 1;
+    const approxSearchesPerDay = Math.max(1, Math.floor(YOUTUBE_QUOTA_UNITS_PER_DAY / estimatedUnits));
+
+    res.json({
+      keyword: q,
+      videos,
+      usage: {
+        searchPages: searchPageCount,
+        channelCalls,
+        estimatedUnits,
+        quotaUnitsPerDay: YOUTUBE_QUOTA_UNITS_PER_DAY,
+        approxFullSearchesPerDay: approxSearchesPerDay,
+      },
+    });
   } catch (err) {
     const msg = formatYoutubeApiError(err);
     const status = err.response?.status;
@@ -286,10 +377,13 @@ app.get('/api/search', authMiddleware, async (req, res) => {
     res.status(502).json({
       error: status ? `[HTTP ${status}] ${msg}` : msg,
     });
+  } finally {
+    searchingByIp.delete(ip);
+    lastSearchCompleteByIp.set(ip, Date.now());
   }
 });
 
-app.post('/api/export', authMiddleware, (req, res) => {
+app.post('/api/export', (req, res) => {
   const { videos, creators } = req.body || {};
   const list = Array.isArray(videos) && videos.length ? videos : creators;
   if (!Array.isArray(list) || !list.length) {
@@ -342,8 +436,9 @@ function sendIndexHtml(_req, res, next) {
   });
 }
 
+app.get('/', sendIndexHtml);
 app.get('/app', sendIndexHtml);
-app.get('/login', sendIndexHtml);
+app.get('/login', (_req, res) => res.redirect(301, '/'));
 
 app.use(express.static(publicDir));
 
@@ -351,5 +446,13 @@ app.listen(PORT, () => {
   console.log(`http://localhost:${PORT}`);
   if (!YOUTUBE_API_KEY) {
     console.warn('[warn] 未设置 YOUTUBE_API_KEY，搜索不可用');
+  } else {
+    const worstUnitsPerSearch = YOUTUBE_SEARCH_MAX_PAGES * 100 + YOUTUBE_SEARCH_MAX_PAGES;
+    const approx = Math.max(1, Math.floor(YOUTUBE_QUOTA_UNITS_PER_DAY / worstUnitsPerSearch));
+    console.log(
+      `[youtube] max pages=${YOUTUBE_SEARCH_MAX_PAGES} (search.list ≈100 units/page); worst-case ≈${worstUnitsPerSearch} units/search; ` +
+        `quota≈${YOUTUBE_QUOTA_UNITS_PER_DAY}/day → about ${approx} heavy searches/day. ` +
+        `minIntervalMs=${YOUTUBE_SEARCH_MIN_INTERVAL_MS} pageDelayMs=${YOUTUBE_SEARCH_PAGE_DELAY_MS}`
+    );
   }
 });
